@@ -80,8 +80,24 @@ public class MyVideoCvAdaptor extends RecyclerView.Adapter<MyVideoCvAdaptor.View
         viewBinderHelper.setOpenOnlyOne(true);
         if (arraylist.get(position).getTitle().startsWith("Pic")) {
             holder.binding.playVideo.setVisibility(View.GONE);
+            database = FirebaseDatabase.getInstance();
+            database.getReference().child("images/"+arraylist.get(position).getVideocv())
+                    .addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            String imagee = snapshot.getValue(String.class);
+                            Glide.with(context).load(imagee).into(holder.binding.imageView);
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+
+
         }
-        holder.binding.linearlay.setOnClickListener(new View.OnClickListener() {
+        holder.binding.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 //                listener.onPicClick(arraylist.get(position).getVideocv());
