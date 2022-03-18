@@ -104,6 +104,7 @@ public class BroadcastsFragment extends BaseFragment implements View.OnTouchList
     private static final int CODE = 772;
     private TextView textView2;
     private ProgressDialog pd;
+    private Boolean canApply;
 
 
     public BroadcastsFragment() {
@@ -144,8 +145,10 @@ public class BroadcastsFragment extends BaseFragment implements View.OnTouchList
         binding.swipe.setOnRefreshListener(this);
         if (getViewModel().getLoggedUser().getSkills()!=null&&getViewModel().getLoggedUser().getSkills().equals("Recruiter")) {
             binding.floatingActionButton.setVisibility(View.VISIBLE);
+            canApply = false;
         } else if (getViewModel().getLoggedUser().getSkills()!=null&&getViewModel().getLoggedUser().getSkills().equals("Job hunter")){
             binding.floatingActionButton.setVisibility(View.GONE);
+            canApply = true;
         }
 
         //map image view
@@ -159,7 +162,7 @@ public class BroadcastsFragment extends BaseFragment implements View.OnTouchList
         binding.floatingActionButton.setOnClickListener(this);
 
 
-        adapter = new LiveStreamsAdapter(getContext(), BroadcastsFragment.this, getViewModel());
+        adapter = new LiveStreamsAdapter(getContext(), BroadcastsFragment.this, getViewModel(), canApply);
         binding.rvLiveStreams.setAdapter(adapter);
         adapter.setData(broadcasts);
         sharedVM = ViewModelProviders.of(Objects.requireNonNull(getActivity())).get(SharedVM.class);

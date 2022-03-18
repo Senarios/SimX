@@ -145,7 +145,7 @@ public class EditProfileFragment extends BaseFragment implements Constants.AUTH,
         pd=Utility.setDialogue(getContext());
 
         storage = FirebaseStorage.getInstance();
-        binding.setLinkeldnProfileLink.setEnabled(false);
+//        binding.setLinkeldnProfileLink.setEnabled(false);
         //clicklistners
         binding.backIcon.setOnClickListener(this);
         binding.profilePicture.setOnClickListener(this);
@@ -207,7 +207,8 @@ public class EditProfileFragment extends BaseFragment implements Constants.AUTH,
 
 
 // +getViewModel().getLoggedUser().getLink() was removed from below line
-        binding.setLinkeldnProfileLink.setText(getString(R.string.linkedin_link));
+        binding.setLinkeldnProfileLink.setText(getViewModel().getLoggedUser().getLink());
+//        binding.setLinkeldnProfileLink.setText(getString(R.string.linkedin_link));
 
 //        binding.typeSelector.setOnSpinnerItemSelectedListener((OnSpinnerItemSelectedListener<String>) (i, o) -> {
 //                    if ( o.equalsIgnoreCase(UserType.RemoteWorker.toString())){
@@ -362,18 +363,14 @@ public class EditProfileFragment extends BaseFragment implements Constants.AUTH,
 //        binding.broadcasterRate.requestFocus();
 //    }
 //    else
-//        if (Utility.getString(binding.setLinkeldnProfileLink).isEmpty() || !Utility.getString(binding.setLinkeldnProfileLink).startsWith("https://www.linkedin.com/in") || !Utility.getString(binding.setLinkeldnProfileLink).matches(regex))
-//    {
-//
-//                binding.setLinkeldnProfileLink.setError("Please Enter Proper Link");
-//                binding.setLinkeldnProfileLink.requestFocus();
-//    }
-//    else
-        if (Utility.getString(binding.name).isEmpty()){
+    if (Utility.getString(binding.setLinkeldnProfileLink).isEmpty() || !Utility.getString(binding.setLinkeldnProfileLink).startsWith("https://www.linkedin.com/in") || !Utility.getString(binding.setLinkeldnProfileLink).matches(regex)) {
+
+                binding.setLinkeldnProfileLink.setError("Please Enter Proper Link");
+                binding.setLinkeldnProfileLink.requestFocus();
+    } else if (Utility.getString(binding.name).isEmpty()){
         binding.name.setError("Please Enter Profile Name");
         binding.name.requestFocus();
-    }
-    else {
+    } else {
 
 //        updatePic();
 

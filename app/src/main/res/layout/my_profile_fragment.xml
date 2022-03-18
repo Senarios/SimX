@@ -77,11 +77,11 @@
                         android:id="@+id/Edit_profile"
                         android:layout_width="@dimen/_18sdp"
                         android:layout_height="@dimen/_18sdp"
-                        android:background="@drawable/green_circle_bg"
                         android:layout_alignStart="@id/Profile_picture"
                         android:layout_alignBottom="@id/Profile_picture"
                         android:layout_marginLeft="@dimen/_43ssp"
                         android:layout_marginTop="@dimen/_2ssp"
+                        android:background="@drawable/green_circle_bg"
                         android:padding="@dimen/_5sdp"
                         android:src="@drawable/ic_pencil" />
 
@@ -307,12 +307,24 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+
+            <TextView
+                android:id="@+id/fragmentTitleTV"
+                android:background="@drawable/profile_fragment_title_bg"
+                android:layout_width="@dimen/_110sdp"
+                android:layout_height="@dimen/_30sdp"
+                android:gravity="center"
+                android:textSize="@dimen/_9sdp"
+                android:textColor="@color/white"
+                android:textStyle="bold"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
+                android:visibility="gone"
                 android:layout_marginTop="@dimen/_5sdp"
                 android:orientation="horizontal">
         <Button

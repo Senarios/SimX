@@ -46,12 +46,14 @@ public class LiveStreamsAdapter extends RecyclerView.Adapter<LiveStreamsAdapter.
     private SharedVM sharedVM;
     private RecyclerViewCallback listener;
     private final ViewBinderHelper viewBinderHelper = new ViewBinderHelper();
+    private final boolean canApply;
 
 
-    public LiveStreamsAdapter(Context context, RecyclerViewCallback listener, SharedVM sharedVM) {
+    public LiveStreamsAdapter(Context context, RecyclerViewCallback listener, SharedVM sharedVM, Boolean canApply) {
         this.context = context;
         this.listener = listener;
         this.sharedVM = sharedVM;
+        this.canApply = canApply;
     }
 
 
@@ -163,29 +165,36 @@ public class LiveStreamsAdapter extends RecyclerView.Adapter<LiveStreamsAdapter.
         }
 
 //        if (sharedVM.getLoggedUser().getSkills().equalsIgnoreCase(UserType.RemoteWorker.toString())) {
-        if (sharedVM.getLoggedUser().getSkills()!=null) {
-            if (!Utility.normalizeStringEqual(broadcast.getUsername(), sharedVM.getLoggedUser().getUsername())) {
-                if (broadcast.getJobCandidates() != null && broadcast.getJobCandidates().size() > 0) {
-                    if (!broadcast.getJobCandidates().contains(new JobCandidates().setUsername(sharedVM.getLoggedUser().getUsername()))) {
+        if(canApply){
+            if (sharedVM.getLoggedUser().getSkills()!=null) {
+                if (!Utility.normalizeStringEqual(broadcast.getUsername(), sharedVM.getLoggedUser().getUsername())) {
+                    if (broadcast.getJobCandidates() != null && broadcast.getJobCandidates().size() > 0) {
+                        if (!broadcast.getJobCandidates().contains(new JobCandidates().setUsername(sharedVM.getLoggedUser().getUsername()))) {
+                            holder.binding.group.setVisibility(View.GONE);
+                            holder.binding.swipeToapply.setVisibility(View.VISIBLE);
+                            holder.binding.root.setLockDrag(false);
+                        }
+                    } else {
                         holder.binding.group.setVisibility(View.GONE);
                         holder.binding.swipeToapply.setVisibility(View.VISIBLE);
                         holder.binding.root.setLockDrag(false);
                     }
                 } else {
                     holder.binding.group.setVisibility(View.GONE);
-                    holder.binding.swipeToapply.setVisibility(View.VISIBLE);
-                    holder.binding.root.setLockDrag(false);
+                    holder.binding.swipeToapply.setVisibility(View.GONE);
+                    holder.binding.root.setLockDrag(true);
                 }
             } else {
                 holder.binding.group.setVisibility(View.GONE);
                 holder.binding.swipeToapply.setVisibility(View.GONE);
-                holder.binding.root.setLockDrag(true);
+                holder.binding.root.setLockDrag(false);
             }
         } else {
             holder.binding.group.setVisibility(View.GONE);
             holder.binding.swipeToapply.setVisibility(View.GONE);
-            holder.binding.root.setLockDrag(false);
+            holder.binding.root.setLockDrag(true);
         }
+
 
         holder.binding.JobButton.setOnClickListener(view -> {
             holder.binding.buttonJob.startAnimation();

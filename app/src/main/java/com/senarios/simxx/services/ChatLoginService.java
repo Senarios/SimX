@@ -47,6 +47,7 @@ import org.greenrobot.eventbus.EventBus;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 import io.reactivex.SingleObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -75,7 +76,7 @@ public class ChatLoginService extends Service implements Constants.QB  {
                 String login = intent.getStringExtra(QB_USER_LOGIN);
                 String password = intent.getStringExtra(QB_PASSWORD);
                 String name = intent.getStringExtra(QB_FULL_NAME);
-                int id = intent.getIntExtra(QB_ID, -1);
+                int id = Integer.parseInt(Objects.requireNonNull(intent.getStringExtra(QB_ID)));
 
                 isIncoming = intent.getBooleanExtra(QB_INCOMING_CALL, false);
                 if (login != null && password != null) {

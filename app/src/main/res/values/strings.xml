@@ -306,4 +306,5 @@ cjr@utsimx.co.uk
     <string name="videoItemText">To apply please upload and share a short video with the advertiser ( 60 seconds or less ) No cv required 😀 Users can easily view your Linkedin profile in the app</string>
     <string name="already_registered_login_me">Already registered. Login me!</string>
     <string name="not_exist_post">This post doesn\'t exist anymore.</string>
+    <string name="title_my_applications">My Applications</string>
 </resources>

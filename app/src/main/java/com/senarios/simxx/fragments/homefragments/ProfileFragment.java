@@ -60,6 +60,7 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
     private Users user;
     FirebaseDatabase database;
     private Activity mActivity;
+    String type;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -118,7 +119,15 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
             binding.ratingText.setText(user.getUserRatings()+"("+user.getTotalRatings()+")");
         }
         initViewPager();
-        loadGalleryFragment();
+        if (getViewModel().getLoggedUser().getSkills() != null && getViewModel().getLoggedUser().getSkills().equals("Recruiter")) {
+            binding.fragmentTitleTV.setText(getString(R.string.title_gallery));
+            loadGalleryFragment();
+//            creator.add("My Applications", new MyJobRequests().getClass());
+        } else {
+            loadMyApplications();
+            binding.fragmentTitleTV.setText(getString(R.string.title_my_applications));
+        }
+
         getFollowers();
 
         showProfilePic();
@@ -153,10 +162,14 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
 
     private void initViewPager() {
 
-        FragmentPagerItems.Creator creator = FragmentPagerItems.with(requireContext()).add("My Gallery", new MyBroadcastFragment().getClass());
+        FragmentPagerItems.Creator creator;
+
 //        if (getViewModel().getLoggedUser().getSkills().equalsIgnoreCase(UserType.RemoteWorker.toString())) {
-        if (getViewModel().getLoggedUser().getSkills()!=null) {
-            creator.add("My Applications", new MyJobRequests().getClass());
+        if (getViewModel().getLoggedUser().getSkills() != null && getViewModel().getLoggedUser().getSkills().equals("Recruiter")) {
+            creator  = FragmentPagerItems.with(requireContext()).add("My Gallery", new MyBroadcastFragment().getClass());
+//            creator.add("My Applications", new MyJobRequests().getClass());
+        } else {
+            creator  = FragmentPagerItems.with(requireContext()).add("My Applications", new MyJobRequests().getClass());
         }
         binding.view.viewPager.setAdapter(new FragmentPagerItemAdapter(getChildFragmentManager(), creator.create()
         ));
@@ -282,6 +295,17 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
         binding.gallery.setBackground(getResources().getDrawable(R.drawable.messages_selected));
         binding.applications.setTextColor(getResources().getColor(R.color.colorPrimary));
         binding.applications.setBackground(getResources().getDrawable(R.drawable.appointments_button_unselected));
+    }
+
+    private void loadMyApplications(){
+        if (getViewModel().getLoggedUser().getSkills()!=null) {
+
+            getChildFragmentManager().beginTransaction().setCustomAnimations(R.anim.fragment_fade_enter, R.anim.fragment_fade_exit).replace(R.id.container, new MyJobRequests()).commitAllowingStateLoss();
+            binding.applications.setTextColor(getResources().getColor(R.color.white));
+            binding.applications.setBackground(getResources().getDrawable(R.drawable.appointments_selected));
+            binding.gallery.setTextColor(getResources().getColor(R.color.colorPrimary));
+            binding.gallery.setBackground(getResources().getDrawable(R.drawable.message_button_unselected));
+        }
     }
 
 }
