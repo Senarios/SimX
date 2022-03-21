@@ -40,6 +40,20 @@
                 android:src="@drawable/scothealth"
                 app:civ_border_color="@color/black"
                 app:civ_border_width="1dp" />
+            <ProgressBar
+                android:id="@+id/editProfileProgress"
+                android:layout_width="@dimen/_35sdp"
+                android:layout_height="@dimen/_35sdp"
+                android:visibility="gone"
+                android:layout_centerInParent="true"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="@dimen/_40sdp"
+                android:layout_marginBottom="@dimen/_45sdp"
+                android:paddingBottom="@dimen/_5ssp"
+                android:src="@drawable/scothealth"
+                app:civ_border_color="@color/black"
+                app:civ_border_width="1dp"
+                />
             <ImageView
                 android:id="@+id/camera_blue"
                 android:layout_width="@dimen/_20sdp"

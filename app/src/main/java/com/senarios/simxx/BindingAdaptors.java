@@ -37,6 +37,7 @@ public class BindingAdaptors {
         Glide.with(view.getContext())
                 .asBitmap()
                 .load(Constants.DreamFactory.GET_IMAGE_URL + photo  + ".png")
+                .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                 .placeholder(R.drawable.h2pay2)
                 .into(new SimpleTarget<Bitmap>() {
                     @Override

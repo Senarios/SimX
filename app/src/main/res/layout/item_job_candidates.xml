@@ -30,7 +30,7 @@
         app:layout_constraintStart_toStartOf="parent"
         android:layout_height="80dp"
         android:id="@+id/imageView"
-        loadUserImage="@{model.username}"
+        loadUserImage="@{model.email}"
         />
 
         <TextView
