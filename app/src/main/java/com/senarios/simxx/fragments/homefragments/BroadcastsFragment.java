@@ -187,7 +187,7 @@ public class BroadcastsFragment extends BaseFragment implements View.OnTouchList
             if (post_check.startsWith("pop")) {
                 AlertDialog.Builder alertDialog = new AlertDialog.Builder(getContext());
                 alertDialog.setTitle("Thank you!");
-                alertDialog.setMessage("Your job is posted to Administrator and will show on wall as soon as he approve it");
+                alertDialog.setMessage("Your job is posted to Administrator and will show on wall as soon as it is approved.");
                 alertDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -286,18 +286,13 @@ public class BroadcastsFragment extends BaseFragment implements View.OnTouchList
                                     } else {
                                         Toast.makeText(getContext(), "Something went wrong..", Toast.LENGTH_SHORT).show();
                                     }
-
-
+                                    
                                 } else {
-
                                     Toast.makeText(getContext(), "Something went wrong..", Toast.LENGTH_SHORT).show();
                                 }
 
-
                             } else {
-
                                 Toast.makeText(getContext(), "Something went wrong..", Toast.LENGTH_SHORT).show();
-
                             }
                         }
 
@@ -454,12 +449,12 @@ public class BroadcastsFragment extends BaseFragment implements View.OnTouchList
                     .subscribe(new SingleObserver<Response<JsonObject>>() {
                         @Override
                         public void onSubscribe(Disposable d) {
-
+                            Log.e("none", "onSubscribe: "+d.toString() );
                         }
 
                         @Override
                         public void onSuccess(Response<JsonObject> response) {
-
+                            Log.e("none", "onSuccess: "+response.message() );
 
                         }
 

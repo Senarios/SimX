@@ -279,7 +279,8 @@ cjr@utsimx.co.uk
  </string>
     <string name="faq_s">FAQ\'s</string>
     <string name="terms_and_condition">Terms And Condition</string>
-    <string name="hyperlinksignup">By clicking next button you are accepting our <a href="https://h2startup.com/termsAndConditions.html"><font color="green">terms and conditions</font></a></string>
+<!--    <string name="hyperlinksignup">By clicking next button you are accepting our \n<a href="https://h2startup.com/termsAndConditions.html"><font color="green">terms and conditions</font></a></string>-->
+    <string name="hyperlinksignup">I accept the <a href="https://h2startup.com/termsAndConditions.html"><font color="green">terms and conditions</font></a></string>
     <string name="hyperlinksignin">By clicking sign in button you are accepting our <a href="https://h2startup.com/termsAndConditions.html"><font color="green">terms and conditions</font></a></string>
     <string name="tv_privacy_policy">Privacy Policy</string>
     <string name="connect_twitter">Please connect your twitter account by going to edit profile!</string>

@@ -140,6 +140,7 @@ public class LoginWithLinkedIn extends BaseFragment implements Constants.QB, Con
         forgot = view.findViewById(R.id.forgot_pass);
         hyperlink = view.findViewById(R.id.hyperlink);
         hyperlink.setMovementMethod(LinkMovementMethod.getInstance());
+        hyperlink.setVisibility(View.GONE);
         signup.setOnClickListener(v -> {
             callback.OnFragmentChange(new SignupFragment(), FragmentTags.SIGNUP);
         });

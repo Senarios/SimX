@@ -194,7 +194,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/_5sdp"
                 android:fontFamily="@font/roboto"
-                android:text="LinkedIn Profile Link"
+                android:text="LinkedIn Profile Link (OPTIONAL)"
                 android:textColor="@color/colorPrimary" />
 
             <EditText

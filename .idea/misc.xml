@@ -10,16 +10,21 @@
       <map>
         <entry key="..\:/Projects/SimXandroid/SimX/app/src/main/res/drawable/messages_selected.xml" value="0.105" />
         <entry key="..\:/Projects/SimXandroid/SimX/app/src/main/res/drawable/profile_fragment_title_bg.xml" value="0.105" />
+        <entry key="..\:/Projects/SimXandroid/SimX/app/src/main/res/layout/activity_create_offline_stream.xml" value="0.2" />
+        <entry key="..\:/Projects/SimXandroid/SimX/app/src/main/res/layout/activity_pic_location.xml" value="0.2028985507246377" />
+        <entry key="..\:/Projects/SimXandroid/SimX/app/src/main/res/layout/activity_play_yt_broadcast.xml" value="0.2028985507246377" />
         <entry key="..\:/Projects/SimXandroid/SimX/app/src/main/res/layout/card_view_live_streams.xml" value="0.22" />
         <entry key="..\:/Projects/SimXandroid/SimX/app/src/main/res/layout/create_profile_fragment1.xml" value="0.33" />
         <entry key="..\:/Projects/SimXandroid/SimX/app/src/main/res/layout/create_profile_fragment2.xml" value="0.22" />
-        <entry key="..\:/Projects/SimXandroid/SimX/app/src/main/res/layout/fragment_edit_profile.xml" value="0.2028985507246377" />
+        <entry key="..\:/Projects/SimXandroid/SimX/app/src/main/res/layout/create_stream_fragment.xml" value="0.1203125" />
+        <entry key="..\:/Projects/SimXandroid/SimX/app/src/main/res/layout/fragment_edit_profile.xml" value="0.33" />
+        <entry key="..\:/Projects/SimXandroid/SimX/app/src/main/res/layout/fragment_login.xml" value="0.2028985507246377" />
         <entry key="..\:/Projects/SimXandroid/SimX/app/src/main/res/layout/fragment_login_image_.xml" value="0.2028985507246377" />
         <entry key="..\:/Projects/SimXandroid/SimX/app/src/main/res/layout/fragment_login_with_linked_in_.xml" value="0.2028985507246377" />
         <entry key="..\:/Projects/SimXandroid/SimX/app/src/main/res/layout/fragment_signup.xml" value="0.25" />
         <entry key="..\:/Projects/SimXandroid/SimX/app/src/main/res/layout/home_screen_fragment.xml" value="0.1" />
         <entry key="..\:/Projects/SimXandroid/SimX/app/src/main/res/layout/item_my_video_cv.xml" value="0.2028985507246377" />
-        <entry key="..\:/Projects/SimXandroid/SimX/app/src/main/res/layout/live_streams_fragment.xml" value="0.1" />
+        <entry key="..\:/Projects/SimXandroid/SimX/app/src/main/res/layout/live_streams_fragment.xml" value="0.22" />
         <entry key="..\:/Projects/SimXandroid/SimX/app/src/main/res/layout/my_profile_fragment.xml" value="0.2" />
         <entry key="..\:/Projects/simx/app/src/main/res/drawable/ripple.xml" value="0.121" />
         <entry key="..\:/Projects/simx/app/src/main/res/layout/activity_chat.xml" value="0.1" />

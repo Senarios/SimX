@@ -17,6 +17,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -66,6 +67,7 @@ public class SignupFragment extends Fragment implements Constants.QB, Constants.
     private SharedVM sharedVM;
     private EditText nameid, emailid, passwordid, conpassid;
     private Button signupbtn;
+    private CheckBox acceptTerms;
     private TextView alreadyregister;
     private String emailpattern = "[a-zA-Z0-9._-]+@[a-z]+.[a-z]+";
     private FirebaseAuth auth;
@@ -117,7 +119,8 @@ public class SignupFragment extends Fragment implements Constants.QB, Constants.
                 LinearLayout.LayoutParams.WRAP_CONTENT);
         loadingdialog.setCancelable(false);
 //        iv_cross = view.findViewById(R.id.iv_cross);
-        btn_next = view.findViewById(R.id.btn_signup_and_next);
+//        btn_next = view.findViewById(R.id.btn_signup_and_next);
+        acceptTerms = view.findViewById(R.id.terms_and_condition_cb);
         auth = FirebaseAuth.getInstance();
         nameid = view.findViewById(R.id.name);
         emailid = view.findViewById(R.id.email);
@@ -225,6 +228,11 @@ public class SignupFragment extends Fragment implements Constants.QB, Constants.
             return;
         } else {
             emailid.setError(null);
+        }
+
+        if(!acceptTerms.isChecked()){
+            Toast.makeText(getContext(), "Accept Terms and Conditions to continue", Toast.LENGTH_SHORT).show();
+            return;
         }
 
 //        SharedPreferences.Editor editor = getContext().getSharedPreferences("signupDB", Context.MODE_PRIVATE).edit();

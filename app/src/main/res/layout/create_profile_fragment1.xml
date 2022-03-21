@@ -88,7 +88,7 @@
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:layout_marginTop="30dp"
-            android:text="Add your Linkeldn profile Username:"
+            android:text="Add your Linkeldn profile Username: (OPTIONAL)"
             android:textAppearance="@style/TextAppearance.AppCompat.Small"
             android:textColor="@color/Black"
             app:layout_constraintStart_toStartOf="@id/one_step_away_text"
