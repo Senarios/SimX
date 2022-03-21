@@ -107,6 +107,18 @@ public class Broadcasts implements Serializable {
     @Expose
     private String videourl;
 
+    @SerializedName("isApproved")
+    @Expose
+    private boolean isApproved;
+
+    public boolean isApproved() {
+        return isApproved;
+    }
+
+    public void setApproved(boolean approved) {
+        isApproved = approved;
+    }
+
     public boolean isMessageonly() {
         return messageonly;
     }

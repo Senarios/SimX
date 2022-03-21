@@ -309,6 +309,15 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@id/videoView"
             app:layout_constraintTop_toTopOf="@id/videoView" />
+        <ProgressBar
+            android:id="@+id/ytProgress"
+            android:layout_width="@dimen/_35sdp"
+            android:layout_height="@dimen/_35sdp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/videoView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/videoView"
+            app:layout_constraintTop_toTopOf="@id/videoView"/>
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline5"

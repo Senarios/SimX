@@ -231,6 +231,7 @@ public class OfflineStreamActivity extends BaseActivity implements LocationHelpe
                                 if (binding.jobDes.getText().toString().startsWith("https://youtu")) {
                                     String fullsize_path_img = "https://img.youtube.com/vi/" + getYouTubeId(binding.jobDes.getText().toString()) + "/0.jpg";
                                     binding.ytThumbnail.setVisibility(View.VISIBLE);
+                                    binding.ytProgress.setVisibility(View.VISIBLE);
                                     binding.group.setVisibility(View.GONE);
 
 //                                    Picasso.get().load(fullsize_path_img).into(binding.ytThumbnail);
@@ -238,7 +239,21 @@ public class OfflineStreamActivity extends BaseActivity implements LocationHelpe
                                     Glide.with(context).load(fullsize_path_img).optionalCenterCrop()
                                             .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                                             .placeholder(R.drawable.h2pay2)
-                                            .error(R.drawable.h2pay2).into(binding.ytThumbnail);
+                                            .error(R.drawable.h2pay2)
+                                            .addListener(new RequestListener<Drawable>() {
+                                                @Override
+                                                public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                                                    binding.ytThumbnail.setVisibility(View.GONE);
+                                                    return false;
+                                                }
+
+                                                @Override
+                                                public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                                                    binding.ytProgress.setVisibility(View.GONE);
+                                                    return false;
+                                                }
+                                            })
+                                            .into(binding.ytThumbnail);
                                 } else {
                                     binding.ytThumbnail.setVisibility(View.GONE);
                                 }
