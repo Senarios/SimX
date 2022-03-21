@@ -98,7 +98,7 @@ public class LiveStreamsAdapter extends RecyclerView.Adapter<LiveStreamsAdapter.
         Utility.showLog("thumbnail " + thumbnail);
 
         if (broadcast.getVideourl()!=null&&broadcast.getVideourl().startsWith("https://youtu")) {
-            String fullsize_path_img = "https://img.youtube.com/vi/"+getYouTubeId(broadcast.getVideourl())+"/0.jpg";
+            String fullsize_path_img = "http://img.youtube.com/vi/"+getYouTubeId(broadcast.getVideourl())+"/0.jpg";
 //            holder.binding.ytlinear.setVisibility(View.VISIBLE);
             Glide.with(context).load(fullsize_path_img).optionalCenterCrop()
                     .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)

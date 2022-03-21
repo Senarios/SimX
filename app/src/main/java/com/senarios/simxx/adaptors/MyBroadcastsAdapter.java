@@ -73,7 +73,7 @@ public class MyBroadcastsAdapter extends RecyclerView.Adapter<MyBroadcastsAdapte
 
 
         if (arrayList.get(position).getVideourl()!=null&&arrayList.get(position).getVideourl().startsWith("https://youtu")) {
-            String fullsize_path_img = "https://img.youtube.com/vi/"+Utility.getYouTubeId(arrayList.get(position).getVideourl())+"/0.jpg";
+            String fullsize_path_img = "http://img.youtube.com/vi/"+Utility.getYouTubeId(arrayList.get(position).getVideourl())+"/0.jpg";
 //            holder.binding.ytlinear.setVisibility(View.VISIBLE);
             Glide.with(context).load(fullsize_path_img)
                     .optionalCenterCrop()
