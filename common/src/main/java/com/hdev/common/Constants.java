@@ -195,7 +195,7 @@ public interface Constants {
         String GET_CAllRECORDS =  "mysql/_table/calls_records";
         String GET_BlOCKED = "mysql/_table/blockedusers";
 
-        String GET_IMAGE_URL="https://web.simx.tv/picture/Photos/";
+        String GET_IMAGE_URL="http://web.simx.tv/picture/Photos/";
 
         String baseLinkForStreamThmbNails = "https://web.simx.tv/picture/Photos/";
         String liveStreamViewerUrl = "https://web.simx.tv:1935/live/";

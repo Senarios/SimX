@@ -286,7 +286,7 @@ public class BroadcastsFragment extends BaseFragment implements View.OnTouchList
                                     } else {
                                         Toast.makeText(getContext(), "Something went wrong..", Toast.LENGTH_SHORT).show();
                                     }
-                                    
+
                                 } else {
                                     Toast.makeText(getContext(), "Something went wrong..", Toast.LENGTH_SHORT).show();
                                 }
