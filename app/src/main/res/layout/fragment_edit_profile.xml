@@ -220,7 +220,7 @@
                 android:background="@drawable/round_backgroud_text"
                 android:elevation="@dimen/_5sdp"
                 android:fontFamily="@font/roboto_light"
-                android:hint="www.linkedin.com/in/junaid"
+                android:hint="https://www.linkedin.com/in/"
                 android:paddingLeft="@dimen/_10sdp"
                 android:textSize="@dimen/_12sdp" />
 

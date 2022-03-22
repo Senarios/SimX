@@ -169,6 +169,8 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
             creator  = FragmentPagerItems.with(requireContext()).add("My Gallery", new MyBroadcastFragment().getClass());
 //            creator.add("My Applications", new MyJobRequests().getClass());
         } else {
+            binding.broadcastsCountLL.setVisibility(View.GONE);
+            binding.broadcastsCountView.setVisibility(View.GONE);
             creator  = FragmentPagerItems.with(requireContext()).add("My Applications", new MyJobRequests().getClass());
         }
         binding.view.viewPager.setAdapter(new FragmentPagerItemAdapter(getChildFragmentManager(), creator.create()

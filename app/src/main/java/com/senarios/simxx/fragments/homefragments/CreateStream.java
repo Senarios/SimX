@@ -382,6 +382,7 @@ public class CreateStream extends BaseFragment implements LocationHelper.Locatio
         broadcast.setSkill(Constants.BROADCASTER);
         broadcast.setImglink(broadcast.getBroadcast());
         broadcast.setOffline(false);
+        broadcast.setApproved(true);
         tags.remove(0);
         broadcast.setTags(tags);
 //       if (binding.isVideoLink.isChecked())
