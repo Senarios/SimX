@@ -188,12 +188,11 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/poundLayout"
-                        android:orientation="horizontal"
-                        android:layout_marginTop="@dimen/_30ssp"
                         android:layout_marginLeft="@dimen/_10ssp"
+                        android:layout_marginTop="@dimen/_30ssp"
                         android:layout_marginRight="@dimen/_10ssp"
                         android:layout_marginBottom="@dimen/_10ssp"
-                        android:weightSum="3">
+                        android:orientation="horizontal">
 
                         <LinearLayout
                             android:layout_width="0dp"
@@ -208,8 +207,8 @@
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/roboto_light"
                                 android:textColor="@color/dark_blue"
-                                android:textStyle="bold"
-                                android:textSize="@dimen/_15ssp" />
+                                android:textSize="@dimen/_15ssp"
+                                android:textStyle="bold" />
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -220,11 +219,12 @@
                                 android:textColor="@color/black"
                                 android:textSize="@dimen/_10ssp" />
                         </LinearLayout>
+
                         <View
                             android:layout_width="1dp"
                             android:layout_height="match_parent"
                             android:layout_gravity="center_vertical"
-                            android:background="@color/DimGray"/>
+                            android:background="@color/DimGray" />
 
                         <LinearLayout
                             android:layout_width="0dp"
@@ -239,8 +239,8 @@
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/roboto_light"
                                 android:textColor="@color/dark_blue"
-                                android:textStyle="bold"
-                                android:textSize="@dimen/_15ssp" />
+                                android:textSize="@dimen/_15ssp"
+                                android:textStyle="bold" />
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -251,17 +251,22 @@
                                 android:textColor="@color/black"
                                 android:textSize="@dimen/_10ssp" />
                         </LinearLayout>
+
                         <View
+                            android:id="@+id/broadcastsCountView"
                             android:layout_width="1dp"
                             android:layout_height="match_parent"
                             android:layout_gravity="center_vertical"
-                            android:background="@color/DimGray"/>
+                            android:background="@color/DimGray" />
+
                         <LinearLayout
+                            android:id="@+id/broadcastsCountLL"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="center_horizontal"
-                            android:orientation="vertical">
+                            android:orientation="vertical"
+                            android:visibility="visible">
 
                             <TextView
                                 android:id="@+id/broadcasts_number"
@@ -269,15 +274,15 @@
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/roboto_light"
                                 android:textColor="@color/dark_blue"
-                                android:textStyle="bold"
-                                android:textSize="@dimen/_15ssp" />
+                                android:textSize="@dimen/_15ssp"
+                                android:textStyle="bold" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="@dimen/_5ssp"
-                                android:text="Broadcasts"
                                 android:fontFamily="@font/roboto_light"
+                                android:text="Broadcasts"
                                 android:textColor="@color/black"
                                 android:textSize="@dimen/_10ssp" />
                         </LinearLayout>

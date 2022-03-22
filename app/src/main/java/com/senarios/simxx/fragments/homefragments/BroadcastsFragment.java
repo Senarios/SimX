@@ -99,7 +99,6 @@ public class BroadcastsFragment extends BaseFragment implements View.OnTouchList
     private Broadcasts broadcast;
     private SharedVM sharedVM;
     private ArrayList<Broadcasts> broadcasts = new ArrayList<>();
-    private ArrayList<Broadcasts> allBroadcasts = new ArrayList<>();
     private final String MEDIA_PICKER = Environment.getExternalStorageDirectory() + "/mediapicker";
     private final String MEDIA_PICKER_VIDEOS = "/videos";
     private static final int CODE = 772;
@@ -136,7 +135,7 @@ public class BroadcastsFragment extends BaseFragment implements View.OnTouchList
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 if (Utility.isLastItemDisplaying(binding.rvLiveStreams)) {
                     if (binding.searchView.getText().toString().isEmpty()) {
-                        getBroadcasts(allBroadcasts.size());
+                        getBroadcasts(broadcasts.size());
                     }
                 }
                 super.onScrolled(recyclerView, dx, dy);
@@ -282,19 +281,19 @@ public class BroadcastsFragment extends BaseFragment implements View.OnTouchList
                                         response.body().setResource(getBroadCastsList(response.body().getResource()));
                                         if (offset == 0) {
                                             broadcasts.clear();
-                                            allBroadcasts.clear();
-                                            List<Broadcasts> brdcstlist = new ArrayList<>();
-                                            for (Broadcasts child : response.body().getResource()) {
-                                                if (child.isApproved())
-                                                    brdcstlist.add(child);
-                                            }
-                                            broadcasts.addAll(brdcstlist);
-                                            allBroadcasts.addAll(response.body().getResource());
-                                        } else {
-                                            broadcasts.addAll(addBroadCasts(response.body().getResource()));
-                                            allBroadcasts.addAll(addAllBroadCasts(response.body().getResource()));
                                         }
-//                                        broadcasts.addAll(offset == 0 ? response.body().getResource() : addBroadCasts(response.body().getResource()));
+//                                        if (offset == 0) {
+//                                            broadcasts.clear();
+//                                            List<Broadcasts> brdcstlist = new ArrayList<>();
+//                                            for (Broadcasts child : response.body().getResource()) {
+//                                                if (child.isApproved())
+//                                                    brdcstlist.add(child);
+//                                            }
+//                                            broadcasts.addAll(brdcstlist);
+//                                        } else {
+//                                            broadcasts.addAll(addBroadCasts(response.body().getResource()));
+//                                        }
+                                        broadcasts.addAll(offset == 0 ? response.body().getResource() : addBroadCasts(response.body().getResource()));
                                         adapter.setData(broadcasts);
 
 
@@ -330,20 +329,20 @@ public class BroadcastsFragment extends BaseFragment implements View.OnTouchList
     private List<Broadcasts> addBroadCasts(List<Broadcasts> resource) {
         List<Broadcasts> brdcstlist = new ArrayList<>();
         for (Broadcasts child : resource) {
-            if (!broadcasts.contains(child)&&child.isApproved())
+            if (!broadcasts.contains(child))
                 brdcstlist.add(child);
         }
         return brdcstlist;
     }
 
-    private List<Broadcasts> addAllBroadCasts(List<Broadcasts> resource) {
+/*    private List<Broadcasts> addAllBroadCasts(List<Broadcasts> resource) {
         List<Broadcasts> brdcstlist = new ArrayList<>();
         for (Broadcasts child : resource) {
             if (!allBroadcasts.contains(child))
                 brdcstlist.add(child);
         }
         return brdcstlist;
-    }
+    }*/
 
     private List<Broadcasts> getBroadCastsList(List<Broadcasts> resource) {
         List<Broadcasts> broadcastList = new ArrayList<>();

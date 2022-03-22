@@ -74,7 +74,7 @@ public interface DataService {
 
 
     @Headers({"Content-Type: application/json", "X-DreamFactory-Api-Key: 88f4e742f60f801b195bb510c533d01bc4470717f4bb5f8195a8429111735a90"})
-    @GET("mysql/_table/broadcasts")
+    @GET("mysql/_table/broadcasts?filter=isApproved=TRUE")
     Single<Response<ResponseBroadcast>> getBroadcasts(@Query("related") String related, @Query("offset") int offest, @Query("limit") int limit, @Query("order") String order);
 
     @Headers("X-DreamFactory-Api-Key: 88f4e742f60f801b195bb510c533d01bc4470717f4bb5f8195a8429111735a90")

@@ -62,6 +62,7 @@ public class OtherUserBroadcastsAdapter extends RecyclerView.Adapter<OtherUserBr
         }
         holder.binding.name.setText(arrayList.get(position).getTitle());
         holder.binding.doctorName.setText(arrayList.get(position).getName());
+        holder.binding.jobDes.setHint("");
         holder.binding.jobDes.setText(arrayList.get(position).getJobDes());
         String thumbnail = Constants.DreamFactory.GET_IMAGE_URL+arrayList.get(position).getBroadcast()+".png";
         Utility.showLog("thumbnail "+thumbnail);
