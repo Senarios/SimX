@@ -631,6 +631,7 @@ public class OfflineStreamActivity extends BaseActivity implements LocationHelpe
         broadcast.setSkill(Constants.BROADCASTER);
         broadcast.setImglink(broadcast.getBroadcast());
         broadcast.setOffline(true);
+        broadcast.setApproved(true);
 //        if (binding.isJob.isChecked()) {
 //        broadcast.setIsjob(binding.isVideoLink.isChecked());
 //        broadcast.setJobDes(binding.jobDes.getText().toString());

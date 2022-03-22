@@ -191,7 +191,7 @@ public class CreateProfile extends BaseFragment implements Constants.SharedPrefe
             user.setSkills(skill);
             Utility.showLog(" " + user.getSkills());
             user.setRate(getViewModel().getSharedPreference().getString(Constants.SharedPreference.HOURLY_RATE, ""));
-            user.setLink("NA");
+            user.setLink(getString(binding.setLinkeldnProfileLink));
             user.setPicture(getViewModel().getSharedPreference().getString(Firebase_Create_Id,""));
             user.setEmail(getViewModel().getSharedPreference().getString(Constants.SharedPreference.Email, ""));
             user.setUsername(getViewModel().getSharedPreference().getString(Firebase_Create_Id, ""));
