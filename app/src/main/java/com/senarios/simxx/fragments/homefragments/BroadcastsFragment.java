@@ -99,6 +99,7 @@ public class BroadcastsFragment extends BaseFragment implements View.OnTouchList
     private Broadcasts broadcast;
     private SharedVM sharedVM;
     private ArrayList<Broadcasts> broadcasts = new ArrayList<>();
+    private ArrayList<Broadcasts> allBroadcasts = new ArrayList<>();
     private final String MEDIA_PICKER = Environment.getExternalStorageDirectory() + "/mediapicker";
     private final String MEDIA_PICKER_VIDEOS = "/videos";
     private static final int CODE = 772;
@@ -135,7 +136,7 @@ public class BroadcastsFragment extends BaseFragment implements View.OnTouchList
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 if (Utility.isLastItemDisplaying(binding.rvLiveStreams)) {
                     if (binding.searchView.getText().toString().isEmpty()) {
-                        getBroadcasts(broadcasts.size());
+                        getBroadcasts(allBroadcasts.size());
                     }
                 }
                 super.onScrolled(recyclerView, dx, dy);
@@ -203,14 +204,17 @@ public class BroadcastsFragment extends BaseFragment implements View.OnTouchList
                 } else {
                     deleteAllfiles(requireActivity().getExternalFilesDir(Environment.DIRECTORY_MOVIES).getPath());
                     Utility.deleteAllfiles(MEDIA_PICKER + MEDIA_PICKER_VIDEOS);
+                    if(textView2 == null || textView2.getText().toString().trim().isEmpty())
                     getBroadcasts(0);
                 }
             } else {
                 if (!(boolean) getViewModel().getPreferences(Constants.SharedPreference.ISUPLOADING, false)) {
                     deleteAllfiles(requireActivity().getExternalFilesDir(Environment.DIRECTORY_MOVIES).getPath());
                     Utility.deleteAllfiles(MEDIA_PICKER + MEDIA_PICKER_VIDEOS);
+                    if(textView2 == null || textView2.getText().toString().trim().isEmpty())
                     getBroadcasts(0);
                 } else {
+                    if(textView2 == null || textView2.getText().toString().trim().isEmpty())
                     getBroadcasts(0);
                 }
             }
@@ -261,7 +265,7 @@ public class BroadcastsFragment extends BaseFragment implements View.OnTouchList
         if (Utility.isNetworkAvailable(requireContext())) {
             binding.swipe.setRefreshing(true);
             getViewModel().getService(Constants.DreamFactory.URL)
-                    .getBroadcasts(BROADCAST_RELATED, offset, 5, Constants.DreamFactory.ORDERBY)
+                    .getBroadcasts(BROADCAST_RELATED, offset, 10, Constants.DreamFactory.ORDERBY)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new SingleObserver<Response<ResponseBroadcast>>() {
@@ -278,8 +282,19 @@ public class BroadcastsFragment extends BaseFragment implements View.OnTouchList
                                         response.body().setResource(getBroadCastsList(response.body().getResource()));
                                         if (offset == 0) {
                                             broadcasts.clear();
+                                            allBroadcasts.clear();
+                                            List<Broadcasts> brdcstlist = new ArrayList<>();
+                                            for (Broadcasts child : response.body().getResource()) {
+                                                if (child.isApproved())
+                                                    brdcstlist.add(child);
+                                            }
+                                            broadcasts.addAll(brdcstlist);
+                                            allBroadcasts.addAll(response.body().getResource());
+                                        } else {
+                                            broadcasts.addAll(addBroadCasts(response.body().getResource()));
+                                            allBroadcasts.addAll(addAllBroadCasts(response.body().getResource()));
                                         }
-                                        broadcasts.addAll(offset == 0 ? response.body().getResource() : addBroadCasts(response.body().getResource()));
+//                                        broadcasts.addAll(offset == 0 ? response.body().getResource() : addBroadCasts(response.body().getResource()));
                                         adapter.setData(broadcasts);
 
 
@@ -315,7 +330,16 @@ public class BroadcastsFragment extends BaseFragment implements View.OnTouchList
     private List<Broadcasts> addBroadCasts(List<Broadcasts> resource) {
         List<Broadcasts> brdcstlist = new ArrayList<>();
         for (Broadcasts child : resource) {
-            if (!broadcasts.contains(child))
+            if (!broadcasts.contains(child)&&child.isApproved())
+                brdcstlist.add(child);
+        }
+        return brdcstlist;
+    }
+
+    private List<Broadcasts> addAllBroadCasts(List<Broadcasts> resource) {
+        List<Broadcasts> brdcstlist = new ArrayList<>();
+        for (Broadcasts child : resource) {
+            if (!allBroadcasts.contains(child))
                 brdcstlist.add(child);
         }
         return brdcstlist;
