@@ -193,24 +193,25 @@ public class OtherUserProfileActivity extends BaseActivity implements BroadcastC
                 }
                 //getRate())>0 this change
                 if (binding.getUser() != null && !binding.getUser().getQbid().equalsIgnoreCase("NA")) {
-                    if (binding.getUser().getRate().isEmpty() || Integer.parseInt(binding.getUser().getRate()) == 0) {
+//                    if (binding.getUser().getRate().isEmpty() || Integer.parseInt(binding.getUser().getRate()) == 0) {
                         getViewModel().getSharedPreference().edit().putInt(QB_OPPONENT_USER, Integer.parseInt(binding.getUser().getQbid())).apply();
                         Intent intent = new Intent(getContext(), CallActivity.class);
                         intent.putExtra(QB_OPPONENT_USER, binding.getUser());
                         startActivity(intent);
-                    } else if (Math.round(getViewModel().getLoggedUser().getCredit()) > 0) {
-                        getViewModel().getSharedPreference().edit().putInt(QB_OPPONENT_USER, Integer.parseInt(binding.getUser().getQbid())).apply();
-                        Intent intent = new Intent(getContext(), CallActivity.class);
-                        intent.putExtra(QB_OPPONENT_USER, binding.getUser());
-                        startActivity(intent);
-                    } else {
-                        Utility.getAlertDialoge(this, "Insufficient Balance", getString(R.string.message_low_balance))
-                                .setPositiveButton("Yes", (dialog, which) ->
-                                        startActivity(new Intent(OtherUserProfileActivity.this, PaymentTestActivity.class)))
-                                .setNegativeButton("No", (dialog, which) -> {
-                                    dialog.dismiss();
-                                }).show();
-                    }
+//                    }
+//                    else if (Math.round(getViewModel().getLoggedUser().getCredit()) > 0) {
+//                        getViewModel().getSharedPreference().edit().putInt(QB_OPPONENT_USER, Integer.parseInt(binding.getUser().getQbid())).apply();
+//                        Intent intent = new Intent(getContext(), CallActivity.class);
+//                        intent.putExtra(QB_OPPONENT_USER, binding.getUser());
+//                        startActivity(intent);
+//                    } else {
+//                        Utility.getAlertDialoge(this, "Insufficient Balance", getString(R.string.message_low_balance))
+//                                .setPositiveButton("Yes", (dialog, which) ->
+//                                        startActivity(new Intent(OtherUserProfileActivity.this, PaymentTestActivity.class)))
+//                                .setNegativeButton("No", (dialog, which) -> {
+//                                    dialog.dismiss();
+//                                }).show();
+//                    }
                 } else {
                     Toast.makeText(getContext(), ERROR, Toast.LENGTH_SHORT).show();
                 }

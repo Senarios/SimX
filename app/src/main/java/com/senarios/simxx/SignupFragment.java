@@ -6,14 +6,12 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -27,23 +25,18 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.SignInMethodQueryResult;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.hdev.common.Constants;
-import com.hdev.common.datamodels.SignupUserDetails;
-import com.senarios.simxx.callbacks.ActivityContainerCallback;
 import com.hdev.common.datamodels.Users;
+import com.senarios.simxx.callbacks.ActivityContainerCallback;
 import com.senarios.simxx.fragments.mainactivityfragments.CreateProfile_IN;
 import com.senarios.simxx.fragments.mainactivityfragments.HomeFragment;
 import com.senarios.simxx.fragments.mainactivityfragments.LoginWithLinkedIn;
@@ -51,7 +44,6 @@ import com.senarios.simxx.services.QbSignUpService;
 import com.senarios.simxx.viewmodels.SharedVM;
 
 import java.util.Objects;
-import java.util.UUID;
 
 import io.reactivex.SingleObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -72,14 +64,15 @@ public class SignupFragment extends Fragment implements Constants.QB, Constants.
     private String emailpattern = "[a-zA-Z0-9._-]+@[a-z]+.[a-z]+";
     private FirebaseAuth auth;
     private FirebaseDatabase database;
-    private TextView hyperlink,chl;
-    EditText email, password;
+    private TextView hyperlink, chl;
     private AppCompatButton btn_next;
     private ActivityContainerCallback callback;
     private ProgressDialog pd;
     String path;
     private Dialog loadingdialog;
-//    private FirebaseAuth auth;
+    ImageButton showPassIcon, showConPassIcon;
+    //    private FirebaseAuth auth;
+    private boolean isShown = false;
 
     public SignupFragment() {
         // Required empty public constructor
@@ -89,8 +82,8 @@ public class SignupFragment extends Fragment implements Constants.QB, Constants.
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        callback=(ActivityContainerCallback)context;
-        sharedVM= ViewModelProviders.of(Objects.requireNonNull(getActivity())).get(SharedVM.class);
+        callback = (ActivityContainerCallback) context;
+        sharedVM = ViewModelProviders.of(Objects.requireNonNull(getActivity())).get(SharedVM.class);
     }
 
     @Override
@@ -126,6 +119,8 @@ public class SignupFragment extends Fragment implements Constants.QB, Constants.
         emailid = view.findViewById(R.id.email);
         passwordid = view.findViewById(R.id.password);
         conpassid = view.findViewById(R.id.con_password);
+        showPassIcon = view.findViewById(R.id.showPasswordIcon);
+        showConPassIcon = view.findViewById(R.id.showConPasswordIcon);
         btn_next = view.findViewById(R.id.btn_signup_and_next);
         alreadyregister = view.findViewById(R.id.tv_already_register);
         hyperlink = view.findViewById(R.id.hyperlink);
@@ -142,13 +137,39 @@ public class SignupFragment extends Fragment implements Constants.QB, Constants.
 //        });
 
         //linkedin
-        alreadyregister.setOnClickListener(v->{
+        alreadyregister.setOnClickListener(v -> {
             callback.OnFragmentChange(new LoginWithLinkedIn(), FragmentTags.LOGINWITHLINKEDIN);
         });
         btn_next.setOnClickListener(v -> {
             registerUser();
         });
 
+        showPassIcon.setOnClickListener(v -> {
+            if (isShown) {
+                showPassIcon.setImageResource(R.drawable.ic_eyeicon_pass);
+                passwordid.setTransformationMethod(new PasswordTransformationMethod());
+                passwordid.setSelection(passwordid.getText().length());
+                isShown = false;
+            } else {
+                showPassIcon.setImageResource(R.drawable.ic_resetpasswordeye);
+                passwordid.setTransformationMethod(null);
+                passwordid.setSelection(passwordid.getText().length());
+                isShown = true;
+            }
+        });
+        showConPassIcon.setOnClickListener(v -> {
+            if (isShown) {
+                showConPassIcon.setImageResource(R.drawable.ic_eyeicon_pass);
+                conpassid.setTransformationMethod(new PasswordTransformationMethod());
+                conpassid.setSelection(conpassid.getText().length());
+                isShown = false;
+            } else {
+                showConPassIcon.setImageResource(R.drawable.ic_resetpasswordeye);
+                conpassid.setTransformationMethod(null);
+                conpassid.setSelection(conpassid.getText().length());
+                isShown = true;
+            }
+        });
 //        SpannableString Signup_Text = new SpannableString(getString(R.string.sign_up));
 //        ClickableSpan span = new ClickableSpan() {
 //            @Override
@@ -230,7 +251,7 @@ public class SignupFragment extends Fragment implements Constants.QB, Constants.
             emailid.setError(null);
         }
 
-        if(!acceptTerms.isChecked()){
+        if (!acceptTerms.isChecked()) {
             Toast.makeText(getContext(), "Accept Terms and Conditions to continue", Toast.LENGTH_SHORT).show();
             return;
         }

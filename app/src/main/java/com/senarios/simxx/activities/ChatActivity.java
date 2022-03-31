@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -137,6 +138,20 @@ public class ChatActivity extends BaseActivity implements PaginationHistoryListe
         getSupportActionBar().setCustomView(binding.getRoot());
         Glide.with(this).load(Constants.DreamFactory.GET_IMAGE_URL + qbUser.getLogin() + ".png").into(binding.profilePicture);
         binding.name.setText("" + qbUser.getFullName());
+
+        SharedPreferences preferences = getSharedPreferences("notificationString", MODE_PRIVATE);
+        String sendNotificationString = preferences.getString(SharedPreference.CALL_MSG, "");
+
+        switch (sendNotificationString) {
+            case "msg":
+                binding.phone.setVisibility(View.GONE);
+                break;
+            case "call":
+            case "both":
+                binding.phone.setVisibility(View.VISIBLE);
+                break;
+        }
+
         binding.navigation.setOnClickListener(v -> {
             qbChatDialog = null;
             sharedVM = null;
@@ -148,24 +163,24 @@ public class ChatActivity extends BaseActivity implements PaginationHistoryListe
         });
         binding.phone.setOnClickListener(v -> {
             if (this.binding.getUser() != null && !this.binding.getUser().getQbid().equalsIgnoreCase("NA")) {
-                if (this.binding.getUser().getRate().isEmpty() || Integer.parseInt(this.binding.getUser().getRate()) == 0) {
+//                if (this.binding.getUser().getRate().isEmpty() || Integer.parseInt(this.binding.getUser().getRate()) == 0) {
                     getViewModel().getSharedPreference().edit().putInt(QB_OPPONENT_USER, Integer.parseInt(this.binding.getUser().getQbid())).apply();
                     Intent intent = new Intent(this, CallActivity.class);
                     intent.putExtra(QB_OPPONENT_USER, this.binding.getUser());
                     startActivity(intent);
-                } else if (Math.round(getViewModel().getLoggedUser().getCredit()) > 0) {
-                    getViewModel().getSharedPreference().edit().putInt(QB_OPPONENT_USER, Integer.parseInt(this.binding.getUser().getQbid())).apply();
-                    Intent intent = new Intent(this, CallActivity.class);
-                    intent.putExtra(QB_OPPONENT_USER, this.binding.getUser());
-                    startActivity(intent);
-                } else {
-                    Utility.getAlertDialoge(this, "Insufficient Balance", getString(R.string.message_low_balance))
-                            .setPositiveButton("Yes", (dialog, which) ->
-                                    startActivity(new Intent(ChatActivity.this, PaymentTestActivity.class)))
-                            .setNegativeButton("No", (dialog, which) -> {
-                                dialog.dismiss();
-                            }).show();
-                }
+//                } else if (Math.round(getViewModel().getLoggedUser().getCredit()) > 0) {
+//                    getViewModel().getSharedPreference().edit().putInt(QB_OPPONENT_USER, Integer.parseInt(this.binding.getUser().getQbid())).apply();
+//                    Intent intent = new Intent(this, CallActivity.class);
+//                    intent.putExtra(QB_OPPONENT_USER, this.binding.getUser());
+//                    startActivity(intent);
+//                } else {
+//                    Utility.getAlertDialoge(this, "Insufficient Balance", getString(R.string.message_low_balance))
+//                            .setPositiveButton("Yes", (dialog, which) ->
+//                                    startActivity(new Intent(ChatActivity.this, PaymentTestActivity.class)))
+//                            .setNegativeButton("No", (dialog, which) -> {
+//                                dialog.dismiss();
+//                            }).show();
+//                }
             }
         });
         binding.info.setOnClickListener(v -> {

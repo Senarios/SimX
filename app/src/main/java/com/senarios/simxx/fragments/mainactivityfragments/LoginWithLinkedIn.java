@@ -15,12 +15,14 @@ import android.text.Spanned;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.text.style.ClickableSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -79,6 +81,8 @@ public class LoginWithLinkedIn extends BaseFragment implements Constants.QB, Con
     String currentUserId;
     private FirebaseAuth auth;
     private Dialog loadingdialog;
+    private boolean isShown = false;
+    ImageButton showPasswordIcon;
 
     public LoginWithLinkedIn() {
         // Required empty public constructor
@@ -125,6 +129,7 @@ public class LoginWithLinkedIn extends BaseFragment implements Constants.QB, Con
     }
 
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     private void initView() {
         //cross imageview\
         auth = FirebaseAuth.getInstance();
@@ -139,6 +144,7 @@ public class LoginWithLinkedIn extends BaseFragment implements Constants.QB, Con
         signup = view.findViewById(R.id.tv_signup);
         forgot = view.findViewById(R.id.forgot_pass);
         hyperlink = view.findViewById(R.id.hyperlink);
+        showPasswordIcon = view.findViewById(R.id.showPasswordIcon);
         hyperlink.setMovementMethod(LinkMovementMethod.getInstance());
         hyperlink.setVisibility(View.GONE);
         signup.setOnClickListener(v -> {
@@ -160,7 +166,19 @@ public class LoginWithLinkedIn extends BaseFragment implements Constants.QB, Con
             loginUser();
 //                callback.OnFragmentChange(new HomeFragment(),FragmentTags.HOME);
         });
-
+        showPasswordIcon.setOnClickListener(v -> {
+            if (isShown) {
+                showPasswordIcon.setImageResource(R.drawable.ic_eyeicon_pass);
+                password.setTransformationMethod(new PasswordTransformationMethod());
+                password.setSelection(password.getText().length());
+                isShown = false;
+            } else {
+                showPasswordIcon.setImageResource(R.drawable.ic_resetpasswordeye);
+                password.setTransformationMethod(null);
+                password.setSelection(password.getText().length());
+                isShown = true;
+            }
+        });
 //        SpannableString Signup_Text = new SpannableString(getString(R.string.sign_up));
 //        ClickableSpan span = new ClickableSpan() {
 //            @Override

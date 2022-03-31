@@ -37,52 +37,129 @@
                 android:layout_height="@dimen/_150sdp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="@dimen/_20sdp"
+                android:layout_marginBottom="@dimen/_20sdp"
                 android:src="@drawable/scothealth" />
 
             <LinearLayout
+                android:id="@+id/idSignUpFirstNameLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/_50sdp"
-                android:gravity="center"
+                android:layout_margin="@dimen/_10sdp"
+                android:gravity="center_horizontal"
                 android:orientation="horizontal">
+
 
                 <EditText
                     android:id="@+id/email"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginLeft="@dimen/_8sdp"
-                    android:layout_marginRight="@dimen/_8sdp"
+                    android:layout_height="48dp"
+                    android:layout_gravity="center_horizontal"
                     android:background="@drawable/background_curve"
-                    android:hint="Enter your email"
-                    android:inputType="textEmailAddress"
-                    android:padding="@dimen/_13sdp"
+                    android:hint="Enter your Email"
+                    android:inputType="text"
+                    android:paddingStart="@dimen/_10sdp"
+                    android:paddingEnd="@dimen/_10sdp"
                     android:textColor="@color/editTextColor"
                     android:textSize="16sp" />
+
+
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/idSignUpLastNameLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/_15sdp"
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="@dimen/_10sdp"
+                android:layout_marginLeft="@dimen/_20sdp"
+                android:layout_marginRight="@dimen/_20sdp"
                 android:gravity="center"
                 android:orientation="horizontal">
 
 
-                <EditText
-                    android:id="@+id/password"
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginLeft="@dimen/_8sdp"
-                    android:layout_marginRight="@dimen/_8sdp"
-                    android:background="@drawable/background_curve"
-                    android:hint="Enter your password"
-                    android:inputType="textPassword"
-                    android:padding="@dimen/_13sdp"
-                    android:textColor="@color/editTextColor"
-                    android:textSize="16sp" />
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/password"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/background_curve"
+                        android:hint="Enter your Password"
+                        android:inputType="textPassword"
+                        android:maxLength="15"
+                        android:paddingStart="@dimen/_10sdp"
+                        android:paddingEnd="@dimen/_10sdp"
+                        android:textColor="@color/editTextColor"
+                        android:textSize="16sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <ImageButton
+                        android:id="@+id/showPasswordIcon"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginRight="10dp"
+                        android:background="#00ffffff"
+                        android:src="@drawable/ic_eyeicon_pass"
+                        app:layout_constraintBottom_toBottomOf="@id/password"
+                        app:layout_constraintRight_toRightOf="@id/password"
+                        app:layout_constraintTop_toTopOf="@id/password" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+
             </LinearLayout>
+
+            <!--            <LinearLayout-->
+            <!--                android:layout_width="match_parent"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_marginTop="@dimen/_50sdp"-->
+            <!--                android:gravity="center"-->
+            <!--                android:visibility="gone"-->
+            <!--                android:orientation="horizontal">-->
+
+            <!--                <EditText-->
+            <!--                    android:id="@+id/email"-->
+            <!--                    android:layout_width="match_parent"-->
+            <!--                    android:layout_height="wrap_content"-->
+            <!--                    android:layout_gravity="center_vertical"-->
+            <!--                    android:layout_marginLeft="@dimen/_8sdp"-->
+            <!--                    android:layout_marginRight="@dimen/_8sdp"-->
+            <!--                    android:background="@drawable/background_curve"-->
+            <!--                    android:hint="Enter your email"-->
+            <!--                    android:inputType="textEmailAddress"-->
+            <!--                    android:padding="@dimen/_13sdp"-->
+            <!--                    android:textColor="@color/editTextColor"-->
+            <!--                    android:textSize="16sp" />-->
+            <!--            </LinearLayout>-->
+
+            <!--            <LinearLayout-->
+            <!--                android:layout_width="match_parent"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_marginTop="@dimen/_15sdp"-->
+            <!--                android:gravity="center"-->
+            <!--                android:visibility="gone"-->
+            <!--                android:orientation="horizontal">-->
+
+
+            <!--                <EditText-->
+            <!--                    android:id="@+id/password"-->
+            <!--                    android:layout_width="match_parent"-->
+            <!--                    android:layout_height="wrap_content"-->
+            <!--                    android:layout_gravity="center_vertical"-->
+            <!--                    android:layout_marginLeft="@dimen/_8sdp"-->
+            <!--                    android:layout_marginRight="@dimen/_8sdp"-->
+            <!--                    android:background="@drawable/background_curve"-->
+            <!--                    android:hint="Enter your password"-->
+            <!--                    android:inputType="textPassword"-->
+            <!--                    android:padding="@dimen/_13sdp"-->
+            <!--                    android:textColor="@color/editTextColor"-->
+            <!--                    android:textSize="16sp" />-->
+            <!--            </LinearLayout>-->
 
 
             <TextView

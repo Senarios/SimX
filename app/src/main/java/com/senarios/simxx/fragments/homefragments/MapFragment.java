@@ -267,7 +267,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback , EditTe
                     googleMap.addMarker(new MarkerOptions()
                             .position(new LatLng(Double.valueOf(broadcasts.get(i).getLatti()), Double.valueOf(broadcasts.get(i).getLongi())))
                             .icon(BitmapDescriptorFactory.fromBitmap(online))
-                            .snippet(broadcasts.get(i).getBroadcast())
+//                            .snippet(broadcasts.get(i).getBroadcast())
                             .title(broadcasts.get(i).getTitle())
                             .alpha(0.7f)
 
@@ -278,7 +278,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback , EditTe
                 googleMap.addMarker(new MarkerOptions()
                         .position(new LatLng(Double.valueOf(broadcasts.get(i).getLatti()), Double.valueOf(broadcasts.get(i).getLongi())))
                         .icon(BitmapDescriptorFactory.fromBitmap(offline))
-                        .snippet(broadcasts.get(i).getBroadcast())
+//                        .snippet(broadcasts.get(i).getBroadcast())
                         .title(broadcasts.get(i).getTitle())
                         .alpha(0.7f)
 
@@ -293,11 +293,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback , EditTe
     @Override
     public boolean onMarkerClick(Marker marker) {
         for (Broadcasts broadcast :temp_broadcasts){
-            if (broadcast.getBroadcast().equalsIgnoreCase(marker.getSnippet())) {
+            if (broadcast.getTitle().equalsIgnoreCase(marker.getTitle())) {
                 if (broadcast.isOffline()){
-                    if(marker.getSnippet()!=null) {
-                        marker.setSnippet(null);
-                    }
                     Utility.makeFilePublic(requireContext(),broadcast ,Constants.S3Constants.OFFLINE_VIDEO_FOLDER+"/"+broadcast.getBroadcast()+OfflineStreamActivity.EXT);
                 }
                 else if (broadcast.getStatus().equalsIgnoreCase(Constants.GoCoder.ONLINE)) {
@@ -311,8 +308,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback , EditTe
                 }
             }
         }
-
-
         return false;
     }
 }
