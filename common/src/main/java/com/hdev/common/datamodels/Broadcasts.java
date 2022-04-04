@@ -110,6 +110,17 @@ public class Broadcasts implements Serializable {
     @SerializedName("isApproved")
     @Expose
     private boolean isApproved;
+    @SerializedName("jobSiteLink")
+    @Expose
+    private String jobSiteLink;
+
+    public String getJobSiteLink() {
+        return jobSiteLink;
+    }
+
+    public void setJobSiteLink(String jobSiteLink) {
+        this.jobSiteLink = jobSiteLink;
+    }
 
     public boolean isApproved() {
         return isApproved;

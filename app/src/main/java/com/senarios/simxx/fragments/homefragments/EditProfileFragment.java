@@ -1,5 +1,7 @@
 package com.senarios.simxx.fragments.homefragments;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -17,8 +19,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
 
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.bumptech.glide.Glide;
@@ -28,26 +34,21 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.google.gson.JsonObject;
 import com.hdev.common.CommonUtils;
+import com.hdev.common.Constants;
 import com.hdev.common.datamodels.NotificationKeys;
 import com.hdev.common.datamodels.NotificationType;
 import com.hdev.common.datamodels.RealPathUtil;
-import com.hdev.common.datamodels.SignupUserDetails;
+import com.hdev.common.datamodels.S3UploadRequest;
 import com.hdev.common.datamodels.UserType;
+import com.hdev.common.datamodels.Users;
 import com.hdev.common.exoplayer.VideoPlayerActivity;
-import com.hdev.common.Constants;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.messages.model.QBEvent;
@@ -55,24 +56,15 @@ import com.senarios.simxx.FragmentTags;
 import com.senarios.simxx.ImageUtil;
 import com.senarios.simxx.R;
 import com.senarios.simxx.Utility;
-import com.senarios.simxx.activities.FullScreenActivity;
 import com.senarios.simxx.activities.MyVideoCVActivity;
 import com.senarios.simxx.activities.OfflineStreamActivity;
 import com.senarios.simxx.activities.PaymentTestActivity;
 import com.senarios.simxx.activities.WithdrawActivity;
 import com.senarios.simxx.databinding.FragmentEditProfileBinding;
-import com.hdev.common.datamodels.S3UploadRequest;
-import com.hdev.common.datamodels.Users;
 import com.senarios.simxx.fragments.BaseFragment;
 import com.senarios.simxx.services.AmazonS3UploadService;
-import com.skydoves.powerspinner.OnSpinnerItemSelectedListener;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.video_trim.TrimmerActivity;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.databinding.DataBindingUtil;
-import androidx.fragment.app.Fragment;
 
 import net.alhazmy13.mediapicker.Image.ImagePicker;
 import net.alhazmy13.mediapicker.Video.VideoPicker;
@@ -86,7 +78,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 
 import io.reactivex.Single;
 import io.reactivex.SingleObserver;
@@ -97,19 +88,17 @@ import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import retrofit2.Response;
 
-import static android.app.Activity.RESULT_OK;
-
-public class EditProfileFragment extends BaseFragment implements Constants.AUTH, View.OnClickListener, Constants,Constants.Messages, Constants.DreamFactory, FragmentTags,QBEntityCallback<QBEvent> {
+public class EditProfileFragment extends BaseFragment implements Constants.AUTH, View.OnClickListener, Constants, Constants.Messages, Constants.DreamFactory, FragmentTags, QBEntityCallback<QBEvent> {
     private ProgressDialog pd;
-    private String[] permissions={"android.permission.CAMERA","android.permission.WRITE_EXTERNAL_STORAGE"};
+    private String[] permissions = {"android.permission.CAMERA", "android.permission.WRITE_EXTERNAL_STORAGE"};
     private final int CODE = 1000;
-    private final int SETTING_CODE=101;
+    private final int SETTING_CODE = 101;
     private final int GALLERY_PICTURE = 2;
     private final int TAKE_PICTURE = 1;
-    private String image,image_name;
+    private String image, image_name;
     private Users user;
-    private String auth,verifier;
-    private S3UploadRequest s3UploadRequest=new S3UploadRequest();
+    private String auth, verifier;
+    private S3UploadRequest s3UploadRequest = new S3UploadRequest();
     private FragmentEditProfileBinding binding;
     String regex = "http(s)?:\\/\\/([\\w]+\\.)?linkedin\\.com\\/in\\/[A-z0-9_-]+";
     FirebaseDatabase database;
@@ -122,9 +111,10 @@ public class EditProfileFragment extends BaseFragment implements Constants.AUTH,
         super.onResume();
 
         if (getViewModel() != null && binding.currentBalanceText != null) {
-            binding.currentBalanceText.setText("Balance \n £ "+getViewModel().getLoggedUser().getCredit());
+            binding.currentBalanceText.setText("Balance \n £ " + getViewModel().getLoggedUser().getCredit());
         }
     }
+
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
@@ -142,12 +132,12 @@ public class EditProfileFragment extends BaseFragment implements Constants.AUTH,
         // Inflate the layout for this fragment
 
 
-        View view= inflater.inflate(R.layout.fragment_edit_profile, container, false);
-        binding= DataBindingUtil.bind(view);
+        View view = inflater.inflate(R.layout.fragment_edit_profile, container, false);
+        binding = DataBindingUtil.bind(view);
 
 
         //
-        pd=Utility.setDialogue(getContext());
+        pd = Utility.setDialogue(getContext());
 
         storage = FirebaseStorage.getInstance();
 //        binding.setLinkeldnProfileLink.setEnabled(false);
@@ -165,26 +155,25 @@ public class EditProfileFragment extends BaseFragment implements Constants.AUTH,
 
         //set values
 
-        binding.name.setText(""+getViewModel().getLoggedUser().getName());
-        binding.broadcasterRate.setText(""+getViewModel().getLoggedUser().getRate());
+        binding.name.setText("" + getViewModel().getLoggedUser().getName());
+        binding.broadcasterRate.setText("" + getViewModel().getLoggedUser().getRate());
 
       /*  if (getViewModel().getLoggedUser().getSkills().equals(UserType.RemoteWorker.toString()))
         {
             binding.broadcasterRate.setText("0");
             binding.broadcasterRate.setEnabled(false);
         }*/
-        if (getViewModel().getLoggedUser().getSkills()!=null && getViewModel().getLoggedUser().getSkills().equalsIgnoreCase(UserType.RemoteWorker.toString())) {
+        if (getViewModel().getLoggedUser().getSkills() != null && getViewModel().getLoggedUser().getSkills().equalsIgnoreCase(UserType.RemoteWorker.toString())) {
 //            binding.typeSelector.selectItemByIndex(1);
 //            binding.groupCv.setVisibility(View.VISIBLE);
             binding.btnWatchVideo.setVisibility(View.VISIBLE);
 
-        }
-        else{
+        } else {
 //            binding.typeSelector.selectItemByIndex(0);
         }
 
         binding.editProfileProgress.setVisibility(View.VISIBLE);
-        Glide.with(this).load(DreamFactory.GET_IMAGE_URL+getViewModel().getLoggedUser().getEmail()+".png")
+        Glide.with(this).load(DreamFactory.GET_IMAGE_URL + getViewModel().getLoggedUser().getEmail() + ".png")
                 .skipMemoryCache(true)
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .apply(RequestOptions.circleCropTransform())
@@ -240,13 +229,13 @@ public class EditProfileFragment extends BaseFragment implements Constants.AUTH,
 //
 //        });
 
-        if (getArguments()!=null){
-            auth=getArguments().getString(AUTH.AUTH_TOKEN);
-            verifier=getArguments().getString(AUTH.AUTH_VERIFIER);
-            getuserAccessToken(auth,verifier);
+        if (getArguments() != null) {
+            auth = getArguments().getString(AUTH.AUTH_TOKEN);
+            verifier = getArguments().getString(AUTH.AUTH_VERIFIER);
+            getuserAccessToken(auth, verifier);
         }
 
-        user=getViewModel().getLoggedUser();
+        user = getViewModel().getLoggedUser();
 
         return view;
     }
@@ -254,7 +243,7 @@ public class EditProfileFragment extends BaseFragment implements Constants.AUTH,
     private void getuserAccessToken(String auth, String verifier) {
         pd.show();
         getViewModel().getServiceforTwitter(Twitter.BASE_URL)
-                .getAccess_Token(verifier,auth , Twitter.consumerKey )
+                .getAccess_Token(verifier, auth, Twitter.consumerKey)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new SingleObserver<Response<String>>() {
@@ -266,28 +255,25 @@ public class EditProfileFragment extends BaseFragment implements Constants.AUTH,
                     @Override
                     public void onSuccess(Response<String> response) {
                         pd.dismiss();
-                        if (response.isSuccessful()){
-                            if (response.code()==200){
-                                if (response.body()!=null){
+                        if (response.isSuccessful()) {
+                            if (response.code() == 200) {
+                                if (response.body() != null) {
                                     Toast.makeText(getContext(), "Successful", Toast.LENGTH_SHORT).show();
-                                    String s=response.body();
-                                    String user_Auth=s.split("&")[0].split("=")[1];
-                                    String user_secret=s.split("&")[1].split("=")[1];
-                                    getViewModel().getSharedPreference().edit().putString(USER_AUTH_TOKEN,user_Auth).apply();
-                                    getViewModel().getSharedPreference().edit().putString(USER_AUTH_SECRET,user_secret).apply();
+                                    String s = response.body();
+                                    String user_Auth = s.split("&")[0].split("=")[1];
+                                    String user_secret = s.split("&")[1].split("=")[1];
+                                    getViewModel().getSharedPreference().edit().putString(USER_AUTH_TOKEN, user_Auth).apply();
+                                    getViewModel().getSharedPreference().edit().putString(USER_AUTH_SECRET, user_secret).apply();
 
 
-                                }
-                                else{
+                                } else {
                                     Toast.makeText(getContext(), ERROR, Toast.LENGTH_SHORT).show();
                                 }
-                            }
-                            else{
+                            } else {
                                 Toast.makeText(getContext(), ERROR, Toast.LENGTH_SHORT).show();
                             }
 
-                        }
-                        else{
+                        } else {
                             Toast.makeText(getContext(), ERROR, Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -305,20 +291,16 @@ public class EditProfileFragment extends BaseFragment implements Constants.AUTH,
 
     @Override
     public void onClick(View v) {
-        int id=v.getId();
+        int id = v.getId();
 
 
-        if (id==R.id.back_icon){
-            if (getParentFragment()!=null) {
+        if (id == R.id.back_icon) {
+            if (getParentFragment() != null) {
                 getParentFragment().getChildFragmentManager().popBackStack();
             }
-        }
-
-        else if (id==R.id.note){
+        } else if (id == R.id.note) {
             Utility.makeFilePublic(requireContext(), null, S3Constants.OTHER + "/" + S3Constants.LINK);
-        }
-
-        else if (id==binding.profilePicture.getId()){
+        } else if (id == binding.profilePicture.getId()) {
             com.github.drjacky.imagepicker.ImagePicker.Companion.with(getActivity())
                     .crop()
                     .cropOval()
@@ -332,8 +314,7 @@ public class EditProfileFragment extends BaseFragment implements Constants.AUTH,
 //            else{
 //                requestPermissions(permissions,CODE);
 //            }
-        }
-        else if (id==binding.saveBtn.getId()){
+        } else if (id == binding.saveBtn.getId()) {
             checks();
         }
 //        else if (id==binding.twitterBtn.getId()){
@@ -348,7 +329,7 @@ public class EditProfileFragment extends BaseFragment implements Constants.AUTH,
 //        else if (id==binding.linkedinBtn.getId()){
 //            Toast.makeText(getContext(), "Linked Connected Successfully!", Toast.LENGTH_SHORT).show();
 //        }
-        else if (id==binding.btnWatchVideo.getId()){
+        else if (id == binding.btnWatchVideo.getId()) {
             startActivity(new Intent(requireContext(), MyVideoCVActivity.class));
 //            if (getViewModel().getLoggedUser().getVideocv()!=null ) {
 //                Utility.makeFilePublic(requireContext(),null,S3Constants.VIDEO_CV_FOLDER+"/"+getViewModel().getLoggedUser().getUsername()+ OfflineStreamActivity.EXT);
@@ -361,11 +342,10 @@ public class EditProfileFragment extends BaseFragment implements Constants.AUTH,
 //            Utility.showVidepPicker(requireActivity());
 //        }
 
-        else if (id==binding.withdrawBtn.getId()){
+        else if (id == binding.withdrawBtn.getId()) {
 //            Toast.makeText(getContext(), "Coming soon", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(getActivity(), WithdrawActivity.class));
-        }
-        else if (id==binding.addPaymentBtn.getId()){
+        } else if (id == binding.addPaymentBtn.getId()) {
 //            Toast.makeText(getContext(), "Coming soon", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(getActivity(), PaymentTestActivity.class));
         }
@@ -383,25 +363,26 @@ public class EditProfileFragment extends BaseFragment implements Constants.AUTH,
 //        binding.broadcasterRate.requestFocus();
 //    }
 //    else
-    if (Utility.getString(binding.setLinkeldnProfileLink).isEmpty() || !Utility.getString(binding.setLinkeldnProfileLink).startsWith("https://www.linkedin.com/in") || !Utility.getString(binding.setLinkeldnProfileLink).matches(regex)) {
-
-                binding.setLinkeldnProfileLink.setError("Please Enter Proper Link");
-                binding.setLinkeldnProfileLink.requestFocus();
-    } else if (Utility.getString(binding.name).isEmpty()){
-        binding.name.setError("Please Enter Profile Name");
-        binding.name.requestFocus();
-    } else {
+//    if (Utility.getString(binding.setLinkeldnProfileLink).isEmpty() || !Utility.getString(binding.setLinkeldnProfileLink).startsWith("https://www.linkedin.com/in") || !Utility.getString(binding.setLinkeldnProfileLink).matches(regex)) {
+//
+//                binding.setLinkeldnProfileLink.setError("Please Enter Proper Link");
+//                binding.setLinkeldnProfileLink.requestFocus();
+//    } else
+        if (Utility.getString(binding.name).isEmpty()) {
+            binding.name.setError("Please Enter Profile Name");
+            binding.name.requestFocus();
+        } else {
 
 //        updatePic();
 
-        user.setName(Utility.getString(binding.name).trim());
-        user.setRate("1");
+            user.setName(Utility.getString(binding.name).trim());
+            user.setRate("1");
 //        user.setSkills( binding.typeSelector.getSpinnerAdapter().getSpinnerView().getText().toString());
-        String[] arr=Utility.getString(binding.setLinkeldnProfileLink).split("/");
-        user.setLink(arr[arr.length-1]);
-        updateUser(user);
+            String[] arr = Utility.getString(binding.setLinkeldnProfileLink).split("/");
+            user.setLink(arr[arr.length - 1]);
+            updateUser(user);
 
-    }
+        }
 
 
     }
@@ -409,14 +390,14 @@ public class EditProfileFragment extends BaseFragment implements Constants.AUTH,
     private void updatePic() {
         SharedPreferences editor = getContext().getSharedPreferences("myProfilee", Context.MODE_PRIVATE);
         String profileid = editor.getString("userProfile", "");
-        final StorageReference reference = storage.getReference().child("profileimages/"+profileid);
+        final StorageReference reference = storage.getReference().child("profileimages/" + profileid);
         reference.putFile(Uri.parse(String.valueOf(uri))).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                     @Override
                     public void onSuccess(Uri uri) {
-                        database.getReference().child("profileimages/"+profileid)
+                        database.getReference().child("profileimages/" + profileid)
                                 .setValue(uri.toString()).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void unused) {
@@ -432,7 +413,7 @@ public class EditProfileFragment extends BaseFragment implements Constants.AUTH,
     private void updateUser(Users user) {
         if (Utility.isNetworkAvailable(requireContext())) {
             pd.show();
-            HashMap<String,Object> map=new HashMap<>();
+            HashMap<String, Object> map = new HashMap<>();
             map.put("resource", user);
             getViewModel().getService(URL).updateUser(map)
                     .subscribeOn(Schedulers.io())
@@ -446,22 +427,19 @@ public class EditProfileFragment extends BaseFragment implements Constants.AUTH,
                         @Override
                         public void onSuccess(Response<JsonObject> response) {
                             pd.dismiss();
-                            if (response.isSuccessful()){
-                                if (response.code()==200){
-                                    if (response.body()!=null){
+                            if (response.isSuccessful()) {
+                                if (response.code() == 200) {
+                                    if (response.body() != null) {
                                         getViewModel().setPreferences(SharedPreference.USER, user);
-                                        getHomeContainer().OnChange(new ProfileFragment(),PROFILE);
-                                    }
-                                    else{
+                                        getHomeContainer().OnChange(new ProfileFragment(), PROFILE);
+                                    } else {
                                         Toast.makeText(getContext(), ERROR, Toast.LENGTH_SHORT).show();
                                     }
-                                }
-                                else{
+                                } else {
                                     Toast.makeText(getContext(), ERROR, Toast.LENGTH_SHORT).show();
                                 }
 
-                            }
-                            else{
+                            } else {
                                 Toast.makeText(getContext(), ERROR, Toast.LENGTH_SHORT).show();
                             }
 
@@ -474,9 +452,8 @@ public class EditProfileFragment extends BaseFragment implements Constants.AUTH,
                         }
                     });
 
-        }
-        else{
-            Toast.makeText(getContext(),NETWORK_ERROR , Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getContext(), NETWORK_ERROR, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -490,39 +467,37 @@ public class EditProfileFragment extends BaseFragment implements Constants.AUTH,
 
         myAlertDialog.setPositiveButton("Gallery",
                 (arg0, arg1) -> {
-            try {
-                Intent i = new Intent(Intent.ACTION_PICK,
-                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(i, GALLERY_PICTURE);
-            }
-            catch (Exception e){
-                Toast.makeText(getContext(), "Please Install appropriate app to handle this action", Toast.LENGTH_SHORT).show();
-            }
+                    try {
+                        Intent i = new Intent(Intent.ACTION_PICK,
+                                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        startActivityForResult(i, GALLERY_PICTURE);
+                    } catch (Exception e) {
+                        Toast.makeText(getContext(), "Please Install appropriate app to handle this action", Toast.LENGTH_SHORT).show();
+                    }
 
                 });
 
         myAlertDialog.setNegativeButton("Camera",
                 (arg0, arg1) -> {
-            try {
-                    Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
-                    startActivityForResult(intent, TAKE_PICTURE);
-                }
-            catch (Exception e){
-            Toast.makeText(getContext(), "Please Install appropriate app to handle this action", Toast.LENGTH_SHORT).show();
-        }
+                    try {
+                        Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+                        startActivityForResult(intent, TAKE_PICTURE);
+                    } catch (Exception e) {
+                        Toast.makeText(getContext(), "Please Install appropriate app to handle this action", Toast.LENGTH_SHORT).show();
+                    }
 
                 });
         myAlertDialog.show();
     }
 
-    private void postImage(String name,String image){
+    private void postImage(String name, String image) {
 
         if (Utility.isNetworkAvailable(requireContext())) {
             pd.show();
-            RequestBody b_image=RequestBody.create(MediaType.parse("text/plain"),image);
-            RequestBody b_image_name=RequestBody.create(MediaType.parse("text/plain"),name);
+            RequestBody b_image = RequestBody.create(MediaType.parse("text/plain"), image);
+            RequestBody b_image_name = RequestBody.create(MediaType.parse("text/plain"), name);
             getViewModel().getService(Constants.POST_IMAGE_URL)
-                    .postPicture(b_image,b_image_name)
+                    .postPicture(b_image, b_image_name)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new SingleObserver<Response<JsonObject>>() {
@@ -536,15 +511,15 @@ public class EditProfileFragment extends BaseFragment implements Constants.AUTH,
                             pd.dismiss();
                             if (response.isSuccessful()) {
                                 if (response.code() == 200) {
-                                    if (response.body()!=null) {
+                                    if (response.body() != null) {
                                         if (response.body().get("boolean").getAsBoolean())
                                             Log.v("image_response", response.toString());
-                                        JSONObject object=new JSONObject();
+                                        JSONObject object = new JSONObject();
                                         try {
-                                            object.put(NotificationKeys.User.toString(),getViewModel().getLoggedUser().toString());
-                                            object.put(NotificationKeys.message.toString(),"SimpleData");
+                                            object.put(NotificationKeys.User.toString(), getViewModel().getLoggedUser().toString());
+                                            object.put(NotificationKeys.message.toString(), "SimpleData");
                                             object.put(NotificationKeys.Type.toString(), NotificationType.PROFILEPICTURE);
-                                            Utility.sendNotification(false,Integer.parseInt(user.getQbid()),object, EditProfileFragment.this);
+                                            Utility.sendNotification(false, Integer.parseInt(user.getQbid()), object, EditProfileFragment.this);
                                         } catch (JSONException e) {
                                             Utility.showELog(e);
                                         }
@@ -562,8 +537,7 @@ public class EditProfileFragment extends BaseFragment implements Constants.AUTH,
                                         });*/
 
                                         Toast.makeText(getContext(), "Image Posted Successfully", Toast.LENGTH_SHORT).show();
-                                    }
-                                    else{
+                                    } else {
                                         Toast.makeText(getContext(), "Something went wrong..", Toast.LENGTH_SHORT).show();
                                     }
 
@@ -591,8 +565,7 @@ public class EditProfileFragment extends BaseFragment implements Constants.AUTH,
                         }
                     });
 
-        }
-        else{
+        } else {
             Toast.makeText(getContext(), "Please Enable Data/Wifi", Toast.LENGTH_SHORT).show();
         }
 
@@ -609,7 +582,7 @@ public class EditProfileFragment extends BaseFragment implements Constants.AUTH,
         return true;
     }
 
-    private  Bitmap resize(Bitmap image, int maxWidth, int maxHeight) {
+    private Bitmap resize(Bitmap image, int maxWidth, int maxHeight) {
         if (maxHeight > 0 && maxWidth > 0) {
             int width = image.getWidth();
             int height = image.getHeight();
@@ -619,9 +592,9 @@ public class EditProfileFragment extends BaseFragment implements Constants.AUTH,
             int finalWidth = maxWidth;
             int finalHeight = maxHeight;
             if (ratioMax > ratioBitmap) {
-                finalWidth = (int) ((float)maxHeight * ratioBitmap);
+                finalWidth = (int) ((float) maxHeight * ratioBitmap);
             } else {
-                finalHeight = (int) ((float)maxWidth / ratioBitmap);
+                finalHeight = (int) ((float) maxWidth / ratioBitmap);
             }
             image = Bitmap.createScaledBitmap(image, finalWidth, finalHeight, true);
             return image;
@@ -629,6 +602,7 @@ public class EditProfileFragment extends BaseFragment implements Constants.AUTH,
             return image;
         }
     }
+
     private Uri getImageUri(Context inContext, Bitmap inImage) {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
@@ -646,36 +620,35 @@ public class EditProfileFragment extends BaseFragment implements Constants.AUTH,
             Log.wtf("pathimage", path);
 //            isImage=true;
             binding.profilePicture.setImageURI(Uri.parse(path));
-            image_name=getViewModel().getLoggedUser().getEmail()+".png";
+            image_name = getViewModel().getLoggedUser().getEmail() + ".png";
             try {
-                postImage(image_name,ImageUtil.convert(MediaStore.Images.Media.getBitmap(requireActivity().getContentResolver() , uri)));
+                postImage(image_name, ImageUtil.convert(MediaStore.Images.Media.getBitmap(requireActivity().getContentResolver(), uri)));
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
 
-        if ( requestCode == TAKE_PICTURE && resultCode == RESULT_OK && data!=null &&data.getExtras() !=null ) {
+        if (requestCode == TAKE_PICTURE && resultCode == RESULT_OK && data != null && data.getExtras() != null) {
             Bitmap photo = (Bitmap) data.getExtras().get("data");
-            if (photo!=null) {
+            if (photo != null) {
                 binding.profilePicture.setImageBitmap(photo);
-                photo=resize(photo,75,75);
-                Uri uri=getImageUri(requireContext(),photo);
-                image_name=getViewModel().getLoggedUser().getUsername()+".png";
+                photo = resize(photo, 75, 75);
+                Uri uri = getImageUri(requireContext(), photo);
+                image_name = getViewModel().getLoggedUser().getUsername() + ".png";
                 /*new File(getRealPathFromURI(uri)).getName();*/
-                image= ImageUtil.convert(photo);
-                postImage(image_name,image);
+                image = ImageUtil.convert(photo);
+                postImage(image_name, image);
             }
 
-        }
-        else if(requestCode == GALLERY_PICTURE  && data!=null &&data.getData() !=null){
+        } else if (requestCode == GALLERY_PICTURE && data != null && data.getData() != null) {
             try {
                 Bitmap photo = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), data.getData());
-                photo=resize(photo,75,75);
+                photo = resize(photo, 75, 75);
                 binding.profilePicture.setImageBitmap(photo);
-                image_name=getViewModel().getLoggedUser().getUsername()+".png";
+                image_name = getViewModel().getLoggedUser().getUsername() + ".png";
                 /*getFileName(data.getData());*/
-                image= ImageUtil.convert(photo);
-                postImage(image_name,image);
+                image = ImageUtil.convert(photo);
+                postImage(image_name, image);
 
             } catch (IOException e) {
                 Toast.makeText(getContext(), "Something went wrong..", Toast.LENGTH_SHORT).show();
@@ -683,8 +656,8 @@ public class EditProfileFragment extends BaseFragment implements Constants.AUTH,
             }
         }
 
-        if (resultCode==SETTING_CODE){
-            if (hasPermissions(getContext(),permissions)){
+        if (resultCode == SETTING_CODE) {
+            if (hasPermissions(getContext(), permissions)) {
                 startDialog();
             }
         }
@@ -700,15 +673,13 @@ public class EditProfileFragment extends BaseFragment implements Constants.AUTH,
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK) {
-                if (result!=null) {
+                if (result != null) {
                     Uri resultUri = result.getUri();
                     binding.profilePicture.setImageURI(resultUri);
                     try {
-                        postImage(image_name=getViewModel().getLoggedUser().getUsername()+".png",ImageUtil.convert( resize(MediaStore.Images.Media.getBitmap(requireActivity().getContentResolver() ,resultUri),200,200)));
+                        postImage(image_name = getViewModel().getLoggedUser().getUsername() + ".png", ImageUtil.convert(resize(MediaStore.Images.Media.getBitmap(requireActivity().getContentResolver(), resultUri), 200, 200)));
 
-                    }
-                    catch (Exception e)
-                    {
+                    } catch (Exception e) {
                         //handle exception
                     }
 
@@ -721,31 +692,30 @@ public class EditProfileFragment extends BaseFragment implements Constants.AUTH,
         if (requestCode == VideoPicker.VIDEO_PICKER_REQUEST_CODE && resultCode == RESULT_OK) {
             if (data != null) {
                 List<String> mPaths = data.getStringArrayListExtra(VideoPicker.EXTRA_VIDEO_PATH);
-                if (mPaths!=null && mPaths.size()>0) {
+                if (mPaths != null && mPaths.size() > 0) {
                     Utility.showLog("Video Success" + mPaths.get(0));
                     s3UploadRequest.setPath(mPaths.get(0));
-                    startActivityForResult(new Intent(requireContext(), TrimmerActivity.class).putExtra(TrimmerActivity.EXTRA_VIDEO_PATH,mPaths.get(0)),TrimmerActivity.CODE);
+                    startActivityForResult(new Intent(requireContext(), TrimmerActivity.class).putExtra(TrimmerActivity.EXTRA_VIDEO_PATH, mPaths.get(0)), TrimmerActivity.CODE);
 
                 }
             }
-        }
-        else if (requestCode == TrimmerActivity.CODE && resultCode == RESULT_OK){
-            if (data!=null){
-                String path=data.getStringExtra(TrimmerActivity.EXTRA_VIDEO_PATH);
+        } else if (requestCode == TrimmerActivity.CODE && resultCode == RESULT_OK) {
+            if (data != null) {
+                String path = data.getStringExtra(TrimmerActivity.EXTRA_VIDEO_PATH);
                 s3UploadRequest.setPath(path);
                 String duration = Utility.convertMillieToHMmSs(Utility.getVideoDuration(path));
                 Utility.showLog("Video Duration" + duration);//use this duration
-                if (isVideoDuration(duration)){
-                    Utility.showLog("trimmed video "+path);
-                    if (path!=null){
+                if (isVideoDuration(duration)) {
+                    Utility.showLog("trimmed video " + path);
+                    if (path != null) {
                         Utility.getAlertDialoge(requireContext(), "Upload Video", "You sure you want to upload this video?")
                                 .setPositiveButton("Yes", (dialog, which) -> {
                                     dialog.dismiss();
                                     s3UploadRequest.setKey(user.getUsername());
-                                    s3UploadRequest.setS3_PATH(Constants.S3Constants.VIDEO_CV_FOLDER+"/"+s3UploadRequest.getKey()+OfflineStreamActivity.EXT);
+                                    s3UploadRequest.setS3_PATH(Constants.S3Constants.VIDEO_CV_FOLDER + "/" + s3UploadRequest.getKey() + OfflineStreamActivity.EXT);
                                     s3UploadRequest.setAction(S3UploadRequest.UploadActions.VIDEOCV);
-                                    Intent intent=new Intent(requireContext(), AmazonS3UploadService.class);
-                                    intent.putExtra(S3_REQUEST,s3UploadRequest);
+                                    Intent intent = new Intent(requireContext(), AmazonS3UploadService.class);
+                                    intent.putExtra(S3_REQUEST, s3UploadRequest);
                                     requireContext().startService(intent);
 
                                 })
@@ -760,7 +730,7 @@ public class EditProfileFragment extends BaseFragment implements Constants.AUTH,
                     Utility.getAlertDialoge(requireContext(), "Video Not Supported", "Your offline pitch duration must be not more than 5 minutes.")
                             .setPositiveButton("Trim Previous Video Again", (dialog, which) -> {
                                 dialog.dismiss();
-                                startActivityForResult(new Intent(requireContext(),TrimmerActivity.class).putExtra(TrimmerActivity.EXTRA_VIDEO_PATH,s3UploadRequest.getPath()),TrimmerActivity.CODE);
+                                startActivityForResult(new Intent(requireContext(), TrimmerActivity.class).putExtra(TrimmerActivity.EXTRA_VIDEO_PATH, s3UploadRequest.getPath()), TrimmerActivity.CODE);
                             })
                             .setNegativeButton("Select New", (dialog, which) -> {
                                 dialog.dismiss();
@@ -771,16 +741,14 @@ public class EditProfileFragment extends BaseFragment implements Constants.AUTH,
                 }
 
 
-
             }
         }
 
     }
 
 
-
-    private void getTwitterAccesstoken(){
-        if (Utility.isNetworkAvailable(getContext())){
+    private void getTwitterAccesstoken() {
+        if (Utility.isNetworkAvailable(getContext())) {
             pd.show();
             getViewModel().getServiceforTwitter(Twitter.BASE_URL)
                     .getRequestToken(Twitter.CallBackURL, Twitter.consumerKey)
@@ -795,30 +763,27 @@ public class EditProfileFragment extends BaseFragment implements Constants.AUTH,
                         @Override
                         public void onSuccess(Response<String> response) {
                             pd.dismiss();
-                            if (response.isSuccessful()){
-                                if (response.code()==200){
-                                    if (response.body()!=null){
-                                        Log.v("requesttoken",response.body());
-                                        String s=response.body();
-                                        String auth=s.split("&")[0].split("=")[1];
-                                        Bundle bundle=new Bundle();
-                                        bundle.putString(AUTH.AUTH_TOKEN,auth);
-                                        Fragment fragment=new TwitterWebView();
+                            if (response.isSuccessful()) {
+                                if (response.code() == 200) {
+                                    if (response.body() != null) {
+                                        Log.v("requesttoken", response.body());
+                                        String s = response.body();
+                                        String auth = s.split("&")[0].split("=")[1];
+                                        Bundle bundle = new Bundle();
+                                        bundle.putString(AUTH.AUTH_TOKEN, auth);
+                                        Fragment fragment = new TwitterWebView();
                                         fragment.setArguments(bundle);
-                                        getHomeContainer().OnChange(fragment,FragmentTags.TWITTERWEBVIEW);
+                                        getHomeContainer().OnChange(fragment, FragmentTags.TWITTERWEBVIEW);
 
 
-                                    }
-                                    else{
+                                    } else {
                                         Toast.makeText(getContext(), ERROR, Toast.LENGTH_SHORT).show();
                                     }
-                                }
-                                else{
+                                } else {
                                     Toast.makeText(getContext(), ERROR, Toast.LENGTH_SHORT).show();
                                 }
 
-                            }
-                            else{
+                            } else {
                                 Toast.makeText(getContext(), ERROR, Toast.LENGTH_SHORT).show();
                             }
 
@@ -831,8 +796,7 @@ public class EditProfileFragment extends BaseFragment implements Constants.AUTH,
                         }
                     });
 
-        }
-        else{
+        } else {
             Toast.makeText(getContext(), NETWORK_ERROR, Toast.LENGTH_SHORT).show();
         }
 
@@ -841,7 +805,7 @@ public class EditProfileFragment extends BaseFragment implements Constants.AUTH,
 
     private void makeFilePublic(String file_id) {
         Single.fromCallable(() -> {
-                    GeneratePresignedUrlRequest urlRequest=new GeneratePresignedUrlRequest(Constants.S3Constants.S3_BUCKET, S3Constants.VIDEO_CV_FOLDER+"/"+file_id+ OfflineStreamActivity.EXT);
+                    GeneratePresignedUrlRequest urlRequest = new GeneratePresignedUrlRequest(Constants.S3Constants.S3_BUCKET, S3Constants.VIDEO_CV_FOLDER + "/" + file_id + OfflineStreamActivity.EXT);
                     return Utility.getS3Client(requireContext()).generatePresignedUrl(urlRequest);
 
                 }
@@ -855,9 +819,9 @@ public class EditProfileFragment extends BaseFragment implements Constants.AUTH,
 
                     @Override
                     public void onSuccess(URL s) {
-                        Utility.showLog("url"+s.toString());
+                        Utility.showLog("url" + s.toString());
                         try {
-                            startActivity(VideoPlayerActivity.newInstance(requireActivity(),s.toString()));
+                            startActivity(VideoPlayerActivity.newInstance(requireActivity(), s.toString()));
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -874,8 +838,8 @@ public class EditProfileFragment extends BaseFragment implements Constants.AUTH,
 
 
     private boolean isVideoDuration(String duration) {
-        return (Integer.parseInt(duration.split(":")[0])==5 && Integer.parseInt(duration.split(":")[1])==0) ||
-                (Integer.parseInt(duration.split(":")[0])<5);
+        return (Integer.parseInt(duration.split(":")[0]) == 5 && Integer.parseInt(duration.split(":")[1]) == 0) ||
+                (Integer.parseInt(duration.split(":")[0]) < 5);
     }
 
     @Override

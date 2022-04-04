@@ -13,6 +13,7 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Toast;
@@ -67,6 +68,7 @@ public class ChatLoginService extends Service implements Constants.QB  {
     private QBUser user;
     private Context context=this;
     public PendingIntent pendingIntent;
+    int id;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -76,7 +78,12 @@ public class ChatLoginService extends Service implements Constants.QB  {
                 String login = intent.getStringExtra(QB_USER_LOGIN);
                 String password = intent.getStringExtra(QB_PASSWORD);
                 String name = intent.getStringExtra(QB_FULL_NAME);
-                int id = Integer.parseInt(Objects.requireNonNull(intent.getStringExtra(QB_ID)));
+//                int id = Integer.parseInt(Objects.requireNonNull(intent.getStringExtra(QB_ID)));
+            if (!TextUtils.isEmpty(intent.getStringExtra(QB_ID)) && TextUtils.isDigitsOnly(intent.getStringExtra(QB_ID))) {
+                id = Integer.parseInt(intent.getStringExtra(QB_ID));
+            } else {
+                id = 0;
+            }
 
                 isIncoming = intent.getBooleanExtra(QB_INCOMING_CALL, false);
                 if (login != null && password != null) {

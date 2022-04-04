@@ -61,7 +61,7 @@ public class JobRequestsAdapter extends RecyclerView.Adapter<JobRequestsAdapter.
            holder.binding.buttonJob.setBackground(context.getDrawable(R.drawable.block_user_button));
        }
 
-        if (arrayList.get(position).getBroadcasts().getVideourl()!=null&&arrayList.get(position).getBroadcasts().getVideourl().startsWith("https://youtu")) {
+        if (arrayList.get(position).getBroadcasts()!=null&&arrayList.get(position).getBroadcasts().getVideourl()!=null&&arrayList.get(position).getBroadcasts().getVideourl().startsWith("https://youtu")) {
             String fullsize_path_img = "https://img.youtube.com/vi/"+Utility.getYouTubeId(arrayList.get(position).getBroadcasts().getVideourl())+"/0.jpg";
 //            holder.binding.ytlinear.setVisibility(View.VISIBLE);
             Glide.with(context).load(fullsize_path_img)
@@ -83,7 +83,7 @@ public class JobRequestsAdapter extends RecyclerView.Adapter<JobRequestsAdapter.
                     })
                     .into(holder.binding.image);
 
-        } else {
+        } else if (arrayList.get(position).getBroadcasts()!=null&&arrayList.get(position).getBroadcasts().getImglink()!=null){
             Glide.with(context).load(Constants.DreamFactory.GET_IMAGE_URL+arrayList.get(position).getBroadcasts().getImglink()+".png")
                     .optionalCenterCrop()
                     .error(R.drawable.h2pay2)

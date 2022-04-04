@@ -88,16 +88,29 @@
         <entry key="..\:/Users/ukash/AndroidStudioProjects/Simx Latest/simx-android/app/src/main/res/menu/video_cv_menu.xml" value="0.16770833333333332" />
         <entry key="..\:/Users/ukash/AndroidStudioProjects/shealth/app/src/main/res/drawable/ic_eyeicon_pass.xml" value="0.18385416666666668" />
         <entry key="..\:/Users/ukash/AndroidStudioProjects/shealth/app/src/main/res/drawable/ic_resetpasswordeye.xml" value="0.18385416666666668" />
+        <entry key="..\:/Users/ukash/AndroidStudioProjects/shealth/app/src/main/res/layout-normal/loading.xml" value="0.16770833333333332" />
+        <entry key="..\:/Users/ukash/AndroidStudioProjects/shealth/app/src/main/res/layout/activity_call_activiy.xml" value="0.16770833333333332" />
         <entry key="..\:/Users/ukash/AndroidStudioProjects/shealth/app/src/main/res/layout/activity_chat.xml" value="0.16770833333333332" />
-        <entry key="..\:/Users/ukash/AndroidStudioProjects/shealth/app/src/main/res/layout/activity_live_stream.xml" value="0.16770833333333332" />
+        <entry key="..\:/Users/ukash/AndroidStudioProjects/shealth/app/src/main/res/layout/activity_create_offline_stream.xml" value="0.4466666666666667" />
+        <entry key="..\:/Users/ukash/AndroidStudioProjects/shealth/app/src/main/res/layout/activity_editor.xml" value="0.16770833333333332" />
+        <entry key="..\:/Users/ukash/AndroidStudioProjects/shealth/app/src/main/res/layout/activity_forgot_password.xml" value="0.14666666666666667" />
+        <entry key="..\:/Users/ukash/AndroidStudioProjects/shealth/app/src/main/res/layout/activity_full_screen.xml" value="0.16770833333333332" />
+        <entry key="..\:/Users/ukash/AndroidStudioProjects/shealth/app/src/main/res/layout/activity_job_video_player.xml" value="0.16770833333333332" />
+        <entry key="..\:/Users/ukash/AndroidStudioProjects/shealth/app/src/main/res/layout/activity_live_stream.xml" value="0.22" />
         <entry key="..\:/Users/ukash/AndroidStudioProjects/shealth/app/src/main/res/layout/activity_view_stream.xml" value="0.16770833333333332" />
         <entry key="..\:/Users/ukash/AndroidStudioProjects/shealth/app/src/main/res/layout/card_view_live_streams.xml" value="0.14722222222222223" />
         <entry key="..\:/Users/ukash/AndroidStudioProjects/shealth/app/src/main/res/layout/create_stream_fragment.xml" value="0.16770833333333332" />
         <entry key="..\:/Users/ukash/AndroidStudioProjects/shealth/app/src/main/res/layout/custom_toolbar.xml" value="0.16770833333333332" />
+        <entry key="..\:/Users/ukash/AndroidStudioProjects/shealth/app/src/main/res/layout/fragment_converastion.xml" value="0.16770833333333332" />
+        <entry key="..\:/Users/ukash/AndroidStudioProjects/shealth/app/src/main/res/layout/fragment_edit_profile.xml" value="0.1" />
+        <entry key="..\:/Users/ukash/AndroidStudioProjects/shealth/app/src/main/res/layout/fragment_incoming_call.xml" value="0.16770833333333332" />
         <entry key="..\:/Users/ukash/AndroidStudioProjects/shealth/app/src/main/res/layout/fragment_login.xml" value="0.14722222222222223" />
         <entry key="..\:/Users/ukash/AndroidStudioProjects/shealth/app/src/main/res/layout/fragment_login_with_linked_in_.xml" value="0.16666666666666666" />
         <entry key="..\:/Users/ukash/AndroidStudioProjects/shealth/app/src/main/res/layout/fragment_map.xml" value="0.16770833333333332" />
+        <entry key="..\:/Users/ukash/AndroidStudioProjects/shealth/app/src/main/res/layout/fragment_my_job_requests.xml" value="0.16770833333333332" />
+        <entry key="..\:/Users/ukash/AndroidStudioProjects/shealth/app/src/main/res/layout/fragment_opponent.xml" value="0.16770833333333332" />
         <entry key="..\:/Users/ukash/AndroidStudioProjects/shealth/app/src/main/res/layout/fragment_signup.xml" value="0.16666666666666666" />
+        <entry key="..\:/Users/ukash/AndroidStudioProjects/shealth/app/src/main/res/layout/item_job_applied.xml" value="0.16770833333333332" />
         <entry key="..\:/Users/ukash/AndroidStudioProjects/shealth/app/src/main/res/layout/my_profile_fragment.xml" value="0.16666666666666666" />
         <entry key="..\:/Users/ukash/AndroidStudioProjects/shealth/app/src/main/res/layout/profile_fragment.xml" value="0.16770833333333332" />
         <entry key="..\:/Users/ukash/AndroidStudioProjects/shealth/common/src/main/res/layout/layout_editext.xml" value="0.16770833333333332" />

@@ -29,6 +29,7 @@ import com.google.android.gms.maps.model.VisibleRegion;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.senarios.simxx.R;
+import com.senarios.simxx.Utility;
 
 import java.io.IOException;
 import java.util.List;
@@ -63,6 +64,7 @@ public class PicLocationActivity extends AppCompatActivity implements
 //            Toast.makeText(getApplicationContext(), "asd", Toast.LENGTH_SHORT).show();
 //        });
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapp);
+        Utility.show(this);
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
         }
@@ -201,6 +203,7 @@ public class PicLocationActivity extends AppCompatActivity implements
                     } else {
                         mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 12.0f));
                     }
+                    Utility.dismiss();
 
                 }
             });

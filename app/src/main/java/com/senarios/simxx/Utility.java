@@ -3,6 +3,7 @@ package com.senarios.simxx;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.Notification;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -28,6 +29,7 @@ import android.text.Spanned;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
@@ -123,6 +125,7 @@ import kotlin.text.Regex;
 public abstract class Utility implements Constants.QB, Constants.SharedPreference {
     private static final String TAG = "Utility";
     private static ProgressDialog dialog;
+    public static Dialog loadingDialog;
 
 
     public static QBEnvironment getDefaultEnvironment() {
@@ -699,6 +702,21 @@ public abstract class Utility implements Constants.QB, Constants.SharedPreferenc
             return matcher.group();
         } else {
             return "error";
+        }
+    }
+
+    public static void show(Activity activity) {
+        loadingDialog = new Dialog(activity);
+        loadingDialog.setContentView(R.layout.loading);
+        loadingDialog.getWindow().setLayout(LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        loadingDialog.setCancelable(false);
+        loadingDialog.show();
+    }
+
+    public static void dismiss() {
+        if (loadingDialog != null && loadingDialog.isShowing()) {
+            loadingDialog.dismiss();
         }
     }
 }

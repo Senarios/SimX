@@ -226,9 +226,10 @@ public class ViewStream extends AppCompatActivity implements WOWZStatusCallback 
         send.setOnClickListener(v -> {
             String text=comment.getText().toString().trim();
             comment.setText("");
-           sendmessage(text);
-           addtoList(text);
-
+            if (!text.isEmpty()) {
+                sendmessage(text);
+                addtoList(text);
+            }
         });
 
 

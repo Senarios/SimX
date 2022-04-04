@@ -90,7 +90,7 @@ public class JobVideoPlayerActivity extends BaseActivity implements Player.Event
         binding.swipe.setEnabled(false);
         binding.swipe.setRefreshing(false);
 
-        if (broadcast.getVideourl() != null && !broadcast.getVideourl().isEmpty()) {
+        if (broadcast!=null&&broadcast.getVideourl() != null && !broadcast.getVideourl().isEmpty()) {
             binding.youtubePlayerView.setVisibility(View.VISIBLE);
             YouTubePlayerView youTubePlayerView = findViewById(R.id.youtube_player_view);
             getLifecycle().addObserver(youTubePlayerView);

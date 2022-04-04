@@ -98,10 +98,31 @@
             android:layout_width="wrap_content"
             android:layout_height="30dp"
             android:layout_marginTop="5dp"
-            android:text="Apply on Job Site"
             app:layout_constraintStart_toStartOf="@id/inputlayout"
             app:layout_constraintTop_toBottomOf="@id/rg_apply_on_video" />
+        <EditText
+            android:id="@+id/jobSite_link"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_40sdp"
+            android:layout_marginEnd="@dimen/_20sdp"
+            android:hint="Apply on Job Site"
+            android:inputType="text"
+            android:textSize="@dimen/_11sdp"
+            app:layout_constraintEnd_toEndOf="@+id/rg_apply_on_jobsite"
+            app:layout_constraintStart_toStartOf="@+id/rg_apply_on_jobsite"
+            app:layout_constraintTop_toTopOf="@+id/rg_apply_on_jobsite"
+            app:layout_constraintBottom_toBottomOf="@+id/rg_apply_on_jobsite"/>
 
+        <View
+            android:id="@+id/jobSiteView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="@+id/jobSite_link"
+            app:layout_constraintStart_toStartOf="@+id/jobSite_link"
+            app:layout_constraintTop_toTopOf="@+id/jobSite_link"
+            app:layout_constraintBottom_toBottomOf="@+id/jobSite_link" />
         <View
             android:id="@+id/linetwo"
             android:layout_width="match_parent"

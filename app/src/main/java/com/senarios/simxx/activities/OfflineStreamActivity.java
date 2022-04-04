@@ -119,6 +119,10 @@ public class OfflineStreamActivity extends BaseActivity implements LocationHelpe
         binding.selectVideo.setClickable(false);
         binding.jobDes.setClickable(true);
         binding.jobDes.setEnabled(true);
+        binding.jobSiteLink.setClickable(false);
+        binding.jobSiteLink.setEnabled(false);
+        binding.jobSiteView.setClickable(false);
+        binding.jobSiteView.setEnabled(false);
         BROADCAST = getViewModel().getLoggedUser().getUsername() + System.currentTimeMillis();
 
         binding.etTitle.setFilters(new InputFilter[]{EMOJI_FILTER});
@@ -152,12 +156,39 @@ public class OfflineStreamActivity extends BaseActivity implements LocationHelpe
         binding.rgApplyOnVideo.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 binding.rgApplyOnJobsite.setChecked(false);
+                binding.jobSiteLink.setText("");
+                binding.jobSiteLink.setClickable(false);
+                binding.jobSiteLink.setEnabled(false);
+                binding.jobSiteView.setClickable(false);
+                binding.jobSiteView.setEnabled(false);
             }
         });
 
         binding.rgApplyOnJobsite.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 binding.rgApplyOnVideo.setChecked(false);
+                binding.jobSiteLink.setClickable(true);
+                binding.jobSiteLink.setEnabled(true);
+                binding.jobSiteView.setClickable(true);
+                binding.jobSiteView.setEnabled(true);
+                binding.jobSiteView.setOnClickListener(v->{
+                    EditText edttxt = new EditText(context);
+                    edttxt.setText(binding.jobSiteLink.getText().toString());
+                    new AlertDialog.Builder(context)
+                            .setTitle("URL")
+                            .setMessage("Add a job site link")
+                            .setView(edttxt)
+                            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    binding.jobSiteLink.setText(edttxt.getText().toString().trim());
+                                }
+                            })
+
+                            // A null listener allows the button to dismiss the dialog and take no further action.
+                            .setNegativeButton(android.R.string.cancel, null)
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .show();
+                });
             }
         });
         binding.isVideoLink.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -315,6 +346,12 @@ public class OfflineStreamActivity extends BaseActivity implements LocationHelpe
             return;
         } else if (binding.isSelectVideo.isChecked() && PATH==null) {
             Toast.makeText(getApplicationContext(), "Select Gallery Video", Toast.LENGTH_SHORT).show();
+            return;
+        } else if (binding.rgApplyOnJobsite.isChecked() && binding.jobSiteLink.getText().toString().trim().isEmpty()) {
+            Toast.makeText(getApplicationContext(), "Enter job site link", Toast.LENGTH_SHORT).show();
+            return;
+        } else if (binding.rgApplyOnJobsite.isChecked() && !binding.jobSiteLink.getText().toString().trim().startsWith("http")) {
+            Toast.makeText(getApplicationContext(), "Enter valid job site link", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -628,6 +665,7 @@ public class OfflineStreamActivity extends BaseActivity implements LocationHelpe
         broadcast.setTags(tags);
         broadcast.setName(getViewModel().getLoggedUser().getName());
         broadcast.setBroadcast(BROADCAST);
+        broadcast.setJobSiteLink(binding.jobSiteLink.getText().toString().trim());
         broadcast.setSkill(Constants.BROADCASTER);
         broadcast.setImglink(broadcast.getBroadcast());
         broadcast.setOffline(true);

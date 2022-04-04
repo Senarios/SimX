@@ -548,9 +548,9 @@ public class BroadcastsFragment extends BaseFragment implements View.OnTouchList
             intent.putExtra("forApply", "forApply");
             startActivityForResult(intent, CODE);
         } else if (broadcast.isApplyonjobsite()) {
-            String url = "https://h2people.com";
+//            String url = "https://h2people.com";
             Intent i = new Intent(Intent.ACTION_VIEW);
-            i.setData(Uri.parse(url));
+            i.setData(Uri.parse(broadcast.getJobSiteLink()));
             startActivity(i);
         }
     }

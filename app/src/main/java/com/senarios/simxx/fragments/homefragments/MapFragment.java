@@ -37,6 +37,7 @@ import com.hdev.common.Constants;
 import com.senarios.simxx.R;
 import com.senarios.simxx.Utility;
 import com.senarios.simxx.activities.OfflineStreamActivity;
+import com.senarios.simxx.activities.PlayYtBroadcastActivity;
 import com.senarios.simxx.activities.ViewStream;
 import com.senarios.simxx.callbacks.HomeContainerCallback;
 import com.hdev.common.datamodels.Broadcasts;
@@ -271,7 +272,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback , EditTe
                             .title(broadcasts.get(i).getTitle())
                             .alpha(0.7f)
 
-                    );
+                    ).setTag(broadcasts.get(i).getImglink());
 
             }
             else{
@@ -282,7 +283,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback , EditTe
                         .title(broadcasts.get(i).getTitle())
                         .alpha(0.7f)
 
-                );
+                ).setTag(broadcasts.get(i).getImglink());
             }
 
         }
@@ -293,7 +294,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback , EditTe
     @Override
     public boolean onMarkerClick(Marker marker) {
         for (Broadcasts broadcast :temp_broadcasts){
-            if (broadcast.getTitle().equalsIgnoreCase(marker.getTitle())) {
+            if (broadcast.getTitle().equalsIgnoreCase(marker.getTitle())&&broadcast.getImglink().equalsIgnoreCase(marker.getTag().toString())) {
                 if (broadcast.isOffline()){
                     Utility.makeFilePublic(requireContext(),broadcast ,Constants.S3Constants.OFFLINE_VIDEO_FOLDER+"/"+broadcast.getBroadcast()+OfflineStreamActivity.EXT);
                 }

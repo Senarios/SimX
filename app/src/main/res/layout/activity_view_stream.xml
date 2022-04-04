@@ -38,7 +38,6 @@
             android:background="@null"
             app:layout_constraintBottom_toBottomOf="@id/bottom"
             app:layout_constraintBottom_toTopOf="@+id/bottom"
-
             app:layout_constraintTop_toTopOf="@id/gl"/>
 
         <ImageView
