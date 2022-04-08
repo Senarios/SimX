@@ -10,8 +10,8 @@
     <string name="APPLICATION_ARN">arn:aws:sns:us-west-2:867277458368:app/GCM/H2startup</string>
 
     <!-- send email strings -->
-    <string name="admin_mail">testconvirza@gmail.com</string>
-    <string name="admin_name">MuhammadWaleed</string>
+    <string name="admin_mail">cjr@utsimx.co.uk</string>
+    <string name="admin_name">Scottish Health</string>
     <string name="mail_title">Job Post Approval</string>
     <string name="mail_body1">A new broadcast</string>
     <string name="mail_body2">is pending for approval</string>

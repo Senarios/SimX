@@ -63,8 +63,8 @@ android {
         minSdkVersion 22
         vectorDrawables.useSupportLibrary = true
         targetSdkVersion 30
-        versionCode 68
-        versionName "1.68"
+        versionCode 70
+        versionName "1.70"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         ndk {
