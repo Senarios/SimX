@@ -2,6 +2,7 @@ package com.senarios.simxx.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -90,6 +91,10 @@ public class JobVideoPlayerActivity extends BaseActivity implements Player.Event
         binding.swipe.setEnabled(false);
         binding.swipe.setRefreshing(false);
 
+        SharedPreferences editor = getSharedPreferences("hunter", MODE_PRIVATE);
+        String userType = editor.getString("jobhunter", "");
+        String userName = editor.getString("username", "");
+
         if (broadcast!=null&&broadcast.getVideourl() != null && !broadcast.getVideourl().isEmpty()) {
             binding.youtubePlayerView.setVisibility(View.VISIBLE);
             YouTubePlayerView youTubePlayerView = findViewById(R.id.youtube_player_view);
@@ -105,13 +110,20 @@ public class JobVideoPlayerActivity extends BaseActivity implements Player.Event
             iniPlayer();
         }
 
-        binding.view.viewPager.setAdapter(new FragmentPagerItemAdapter(getSupportFragmentManager(),
-                FragmentPagerItems.with(this)
-                .add("JobHunter",new JobCandidatesFragment().getClass(),getBundle(false))
-                .add("JobHunter OpenForWork",new ShortlistJCFragment().getClass(),getBundle(true))
-                .create()
-                ));
-        binding.view.tabs.setViewPager(binding.view.viewPager);
+        if (!userType.isEmpty()&&userType!=null&&userType.equalsIgnoreCase("Job hunter")) {
+            binding.view.viewPager.setVisibility(View.GONE);
+        } else if (broadcast.getUsername().equalsIgnoreCase(userName)){
+            binding.view.viewPager.setVisibility(View.VISIBLE);
+            binding.view.viewPager.setAdapter(new FragmentPagerItemAdapter(getSupportFragmentManager(),
+                    FragmentPagerItems.with(this)
+                            .add("Applicants",new JobCandidatesFragment().getClass(),getBundle(false))
+                            .add("Shortlist Applicants",new ShortlistJCFragment().getClass(),getBundle(true))
+                            .create()
+            ));
+            binding.view.tabs.setViewPager(binding.view.viewPager);
+        }
+
+
 
     }
     private String getYouTubeId(String youTubeUrl) {

@@ -9,6 +9,7 @@ public interface FragmentTags {
     String FOLLOWERS="followers";
     String FOLLOWINGS="followings";
     String LOGINWITHLINKEDIN="loginWithLinkedIn";
+    String RETURNTOHOME="returntohome";
     String WEBVIEW ="webView";
     String SIGNUP ="signup";
     String CREATE_PROFILE_IN ="createProfile1";

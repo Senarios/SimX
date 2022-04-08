@@ -17,6 +17,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
@@ -55,6 +56,8 @@ import com.senarios.simxx.Utility;
 import com.senarios.simxx.adaptors.CommentsAdaptor;
 import com.hdev.common.datamodels.Broadcasts;
 import com.hdev.common.datamodels.Comments;
+import com.senarios.simxx.models.ApiService;
+import com.senarios.simxx.models.SendMailRes;
 import com.senarios.simxx.viewmodels.SharedVM;
 import com.wowza.gocoder.sdk.api.WowzaGoCoder;
 import com.wowza.gocoder.sdk.api.broadcast.WOWZBroadcast;
@@ -73,6 +76,8 @@ import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -89,7 +94,11 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import jp.wasabeef.recyclerview.animators.FadeInAnimator;
+import retrofit2.Call;
+import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 import static com.hdev.common.Constants.Messages.NETWORK_ERROR;
 import static com.hdev.common.Constants.SharedPreference.B_LINKEDIN;
@@ -433,9 +442,7 @@ public class LiveStreamActivity extends AppCompatActivity implements WOWZStatusC
                     String s = chronometer.getText().toString().split(":")[0] + chronometer.getText().toString().split(":")[1];
                     int time = Integer.parseInt(s);
                     if (time > 15) {
-                        chronometer.stop();
-                        broadcast.setStatus(Constants.GoCoder.OFFLINE);
-                        updateBroadcast(broadcast);
+                        sendMailAndEndLiveStream();
                     } else {
                         Toast.makeText(this, "You cannot End Stream Before 15 Seconds!", Toast.LENGTH_SHORT).show();
                     }
@@ -449,6 +456,39 @@ public class LiveStreamActivity extends AppCompatActivity implements WOWZStatusC
         });
 
 
+    }
+
+    private void sendMailAndEndLiveStream() {
+        pd.show();
+        Retrofit retrofit = new Retrofit.Builder().baseUrl("http://web.simx.tv/")
+                .addConverterFactory(GsonConverterFactory.create()).build();
+        ApiService apiPost = retrofit.create(ApiService.class);
+        Call<SendMailRes> call = apiPost.sendMail(getString(R.string.admin_mail),getString(R.string.admin_name),
+                getString(R.string.mail_title),getString(R.string.mail_body1)+" "+broadcast.getTitle()+" "+getString(R.string.mail_body2));
+        call.enqueue(new Callback<SendMailRes>() {
+            @Override
+            public void onResponse(Call<SendMailRes> call, Response<SendMailRes> response) {
+                if (response.isSuccessful()) {
+//                    pd.dismiss();
+                    chronometer.stop();
+                    broadcast.setStatus(Constants.GoCoder.OFFLINE);
+                    updateBroadcast(broadcast);
+                } else {
+                    pd.dismiss();
+                    Toast.makeText(LiveStreamActivity.this, "Process Failed", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SendMailRes> call, Throwable t) {
+                pd.dismiss();
+                if (t instanceof SocketTimeoutException) {
+                    Toast.makeText(LiveStreamActivity.this, "Time out, Please try again", Toast.LENGTH_SHORT).show();
+                } else if (t instanceof IOException) {
+                    Toast.makeText(LiveStreamActivity.this, "Check you internet connection", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     private void sendmessage(String text) {
@@ -570,7 +610,7 @@ public class LiveStreamActivity extends AppCompatActivity implements WOWZStatusC
 
     private void updateBroadcast(Broadcasts broadcasts) {
         if (Utility.isNetworkAvailable(this)) {
-            pd.show();
+//            pd.show();
             broadcasts.setTags(null);
             BroadcastRequestBody broadcastRequestBody = new BroadcastRequestBody();
             broadcastRequestBody.setBroadcasts(broadcasts);
@@ -809,9 +849,7 @@ public class LiveStreamActivity extends AppCompatActivity implements WOWZStatusC
         String s = chronometer.getText().toString().split(":")[0] + chronometer.getText().toString().split(":")[1];
         int time = Integer.parseInt(s);
         if (time > 15) {
-            chronometer.stop();
-            broadcast.setStatus(Constants.GoCoder.OFFLINE);
-            updateBroadcast(broadcast);
+            sendMailAndEndLiveStream();
         } else {
             Toast.makeText(this, "You cannot End Stream Before 15 Seconds!", Toast.LENGTH_SHORT).show();
         }
@@ -827,8 +865,9 @@ public class LiveStreamActivity extends AppCompatActivity implements WOWZStatusC
         } else if (chronometer.getText().toString().equalsIgnoreCase("00:14")) {
             postThumbnail();
         } else if (chronometer.getText().toString().equalsIgnoreCase(mDuration)) {
-            broadcast.setStatus(Constants.GoCoder.OFFLINE);
-            updateBroadcast(broadcast);
+//            broadcast.setStatus(Constants.GoCoder.OFFLINE);
+//            updateBroadcast(broadcast);
+            sendMailAndEndLiveStream();
         }
     }
 

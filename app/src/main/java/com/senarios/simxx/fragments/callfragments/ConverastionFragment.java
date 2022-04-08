@@ -2,6 +2,7 @@ package com.senarios.simxx.fragments.callfragments;
 
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -169,7 +170,9 @@ public class ConverastionFragment extends Fragment implements SessionController.
             @Override
             public void onClick(View v) {
                 controller.hangUpCurrentSession(" because I'm busy");
-
+                SharedPreferences.Editor editor = getContext().getSharedPreferences("notificationString", Context.MODE_PRIVATE).edit();
+                editor.putString("callreturn", "yes");
+                editor.apply();
             }
         });
 
@@ -362,7 +365,11 @@ public class ConverastionFragment extends Fragment implements SessionController.
     @Override
     public void onCallRejectByUser(QBRTCSession session, Integer userId, String userInfo) {
         if (controller!=null) {
+            SharedPreferences.Editor editor = getContext().getSharedPreferences("notificationString", Context.MODE_PRIVATE).edit();
+            editor.putString("callreturn", "yes");
+            editor.apply();
             controller.hangUpCurrentSession("busy");
+            getActivity().finish();
         }
     }
 
@@ -379,12 +386,18 @@ public class ConverastionFragment extends Fragment implements SessionController.
     @Override
     public void onReceiveHangUpFromUser(QBRTCSession session, Integer userId, String userInfo) {
        if (isOutgoing){
+           SharedPreferences.Editor editor = getContext().getSharedPreferences("notificationString", Context.MODE_PRIVATE).edit();
+           editor.putString("callreturn", "yes");
+           editor.apply();
            fragmentCallBacks.OnChange(new OpponentFragment(),OPPONENTS_CALL_FRAGMENT);
        }
        else{
            if (getActivity()!=null){
-
+               SharedPreferences.Editor editor = getContext().getSharedPreferences("notificationString", Context.MODE_PRIVATE).edit();
+               editor.putString("callreturn", "yes");
+               editor.apply();
                getActivity().finish();
+
            }
        }
 
@@ -397,6 +410,7 @@ public class ConverastionFragment extends Fragment implements SessionController.
             currentSession.getMediaStreamManager().setVideoEnabled(isNeedEnableCam);
         }
     }
+
 
     private void enableAudio(boolean enable) {
         if (currentSession != null) {

@@ -2,6 +2,8 @@ package com.senarios.simxx.fragments.homefragments;
 
 
 import static android.content.Context.MODE_PRIVATE;
+import static com.senarios.simxx.Utility.deleteAllfiles;
+import static com.senarios.simxx.Utility.getService;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -39,11 +41,18 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.hdev.common.Constants;
+import com.hdev.common.datamodels.Broadcasts;
+import com.hdev.common.datamodels.JobCandidates;
+import com.hdev.common.datamodels.NetworkModel;
 import com.hdev.common.datamodels.NotificationKeys;
 import com.hdev.common.datamodels.NotificationType;
+import com.hdev.common.datamodels.ResponseBroadcast;
+import com.hdev.common.datamodels.S3UploadRequest;
 import com.hdev.common.datamodels.Tags;
 import com.hdev.common.datamodels.Users;
 import com.hdev.common.datamodels.VideoCv;
+import com.hdev.common.retrofit.ApiResponse;
+import com.hdev.common.retrofit.NetworkCall;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.messages.model.QBEvent;
@@ -59,16 +68,10 @@ import com.senarios.simxx.activities.ViewStream;
 import com.senarios.simxx.adaptors.LiveStreamsAdapter;
 import com.senarios.simxx.adaptors.RecyclerViewCallback;
 import com.senarios.simxx.databinding.LiveStreamsFragmentBinding;
-import com.hdev.common.datamodels.Broadcasts;
-import com.hdev.common.datamodels.JobCandidates;
-import com.hdev.common.datamodels.NetworkModel;
-import com.hdev.common.datamodels.ResponseBroadcast;
-import com.hdev.common.datamodels.S3UploadRequest;
 import com.senarios.simxx.fragments.BaseFragment;
 import com.senarios.simxx.fragments.mainactivityfragments.HomeFragment;
-import com.hdev.common.retrofit.ApiResponse;
-import com.hdev.common.retrofit.NetworkCall;
 import com.senarios.simxx.services.AmazonS3UploadService;
+import com.senarios.simxx.services.ChatLoginService;
 import com.senarios.simxx.viewmodels.SharedVM;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -86,9 +89,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Response;
-
-import static com.senarios.simxx.Utility.deleteAllfiles;
-import static com.senarios.simxx.Utility.getService;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -125,6 +125,11 @@ public class BroadcastsFragment extends BaseFragment implements View.OnTouchList
             ((HomeFragment) getParentFragment()).nav_view.getMenu().getItem(1).setChecked(true);
         }
 
+        SharedPreferences.Editor editor = getContext().getSharedPreferences("hunter", MODE_PRIVATE).edit();
+        editor.putString("jobhunter", getViewModel().getLoggedUser().getSkills());
+        editor.putString("username", getViewModel().getLoggedUser().getUsername());
+        editor.apply();
+
         binding.rvLiveStreams.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
@@ -143,10 +148,10 @@ public class BroadcastsFragment extends BaseFragment implements View.OnTouchList
         });
 
         binding.swipe.setOnRefreshListener(this);
-        if (getViewModel().getLoggedUser().getSkills()!=null&&getViewModel().getLoggedUser().getSkills().equals("Recruiter")) {
+        if (getViewModel().getLoggedUser().getSkills() != null && getViewModel().getLoggedUser().getSkills().equals("Recruiter")) {
             binding.floatingActionButton.setVisibility(View.VISIBLE);
             canApply = false;
-        } else if (getViewModel().getLoggedUser().getSkills()!=null&&getViewModel().getLoggedUser().getSkills().equals("Job hunter")){
+        } else if (getViewModel().getLoggedUser().getSkills() != null && getViewModel().getLoggedUser().getSkills().equals("Job hunter")) {
             binding.floatingActionButton.setVisibility(View.GONE);
             canApply = true;
         }
@@ -203,18 +208,18 @@ public class BroadcastsFragment extends BaseFragment implements View.OnTouchList
                 } else {
                     deleteAllfiles(requireActivity().getExternalFilesDir(Environment.DIRECTORY_MOVIES).getPath());
                     Utility.deleteAllfiles(MEDIA_PICKER + MEDIA_PICKER_VIDEOS);
-                    if(textView2 == null || textView2.getText().toString().trim().isEmpty())
-                    getBroadcasts(0);
+                    if (textView2 == null || textView2.getText().toString().trim().isEmpty())
+                        getBroadcasts(0);
                 }
             } else {
                 if (!(boolean) getViewModel().getPreferences(Constants.SharedPreference.ISUPLOADING, false)) {
                     deleteAllfiles(requireActivity().getExternalFilesDir(Environment.DIRECTORY_MOVIES).getPath());
                     Utility.deleteAllfiles(MEDIA_PICKER + MEDIA_PICKER_VIDEOS);
-                    if(textView2 == null || textView2.getText().toString().trim().isEmpty())
-                    getBroadcasts(0);
+                    if (textView2 == null || textView2.getText().toString().trim().isEmpty())
+                        getBroadcasts(0);
                 } else {
-                    if(textView2 == null || textView2.getText().toString().trim().isEmpty())
-                    getBroadcasts(0);
+                    if (textView2 == null || textView2.getText().toString().trim().isEmpty())
+                        getBroadcasts(0);
                 }
             }
         } catch (Exception e) {
@@ -257,7 +262,15 @@ public class BroadcastsFragment extends BaseFragment implements View.OnTouchList
     @Override
     public void onResume() {
         super.onResume();
+        //service for again call
+        Intent login = new Intent(getActivity(), ChatLoginService.class);
+        login.putExtra(QB_USER_LOGIN, getViewModel().getSharedPreference().getString(Email, ""));
+        login.putExtra(QB_PASSWORD, QB_DEFAULT_PASSWORD);
+        login.putExtra(QB_FULL_NAME, getViewModel().getSharedPreference().getString(Fullname, ""));
+        login.putExtra(QB_ID, getViewModel().getLoggedUser().getQbid());
+        requireContext().startService(login);
         initPreviousVideoTask();
+
     }
 
     private void getBroadcasts(int offset) {
@@ -274,26 +287,27 @@ public class BroadcastsFragment extends BaseFragment implements View.OnTouchList
                         }
 
                         @Override
-                        public void onSuccess(Response<ResponseBroadcast> response) { binding.swipe.setRefreshing(false);
+                        public void onSuccess(Response<ResponseBroadcast> response) {
+                            binding.swipe.setRefreshing(false);
                             if (response.isSuccessful()) {
                                 if (response.code() == 200) {
                                     if (response.body() != null) {
                                         response.body().setResource(getBroadCastsList(response.body().getResource()));
-                                        if (offset == 0) {
-                                            broadcasts.clear();
-                                        }
 //                                        if (offset == 0) {
 //                                            broadcasts.clear();
-//                                            List<Broadcasts> brdcstlist = new ArrayList<>();
-//                                            for (Broadcasts child : response.body().getResource()) {
-//                                                if (child.isApproved())
-//                                                    brdcstlist.add(child);
-//                                            }
-//                                            broadcasts.addAll(brdcstlist);
-//                                        } else {
-//                                            broadcasts.addAll(addBroadCasts(response.body().getResource()));
 //                                        }
-                                        broadcasts.addAll(offset == 0 ? response.body().getResource() : addBroadCasts(response.body().getResource()));
+                                        if (offset == 0) {
+                                            broadcasts.clear();
+                                            List<Broadcasts> brdcstlist = new ArrayList<>();
+                                            for (Broadcasts child : response.body().getResource()) {
+                                                if (child.getJobPostStatus().equalsIgnoreCase("Approved"))
+                                                    brdcstlist.add(child);
+                                            }
+                                            broadcasts.addAll(brdcstlist);
+                                        } else {
+                                            broadcasts.addAll(addBroadCasts(response.body().getResource()));
+                                        }
+//                                        broadcasts.addAll(offset == 0 ? response.body().getResource() : addBroadCasts(response.body().getResource()));
                                         adapter.setData(broadcasts);
 
 
@@ -329,7 +343,7 @@ public class BroadcastsFragment extends BaseFragment implements View.OnTouchList
     private List<Broadcasts> addBroadCasts(List<Broadcasts> resource) {
         List<Broadcasts> brdcstlist = new ArrayList<>();
         for (Broadcasts child : resource) {
-            if (!broadcasts.contains(child))
+            if (!broadcasts.contains(child) && child.getJobPostStatus().equalsIgnoreCase("Approved"))
                 brdcstlist.add(child);
         }
         return brdcstlist;
@@ -472,12 +486,12 @@ public class BroadcastsFragment extends BaseFragment implements View.OnTouchList
                     .subscribe(new SingleObserver<Response<JsonObject>>() {
                         @Override
                         public void onSubscribe(Disposable d) {
-                            Log.e("none", "onSubscribe: "+d.toString() );
+                            Log.e("none", "onSubscribe: " + d.toString());
                         }
 
                         @Override
                         public void onSuccess(Response<JsonObject> response) {
-                            Log.e("none", "onSuccess: "+response.message() );
+                            Log.e("none", "onSuccess: " + response.message());
 
                         }
 
@@ -492,7 +506,7 @@ public class BroadcastsFragment extends BaseFragment implements View.OnTouchList
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.wtf("onDestroy","yes");
+        Log.wtf("onDestroy", "yes");
     }
 
     @Override
@@ -688,9 +702,9 @@ public class BroadcastsFragment extends BaseFragment implements View.OnTouchList
                 if (videoCv != null) {
                     applyJob(videoCv.getId());
                 }
-                }
             }
         }
+    }
 
 
     @Override

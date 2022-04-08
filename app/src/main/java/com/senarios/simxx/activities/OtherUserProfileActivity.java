@@ -127,6 +127,22 @@ public class OtherUserProfileActivity extends BaseActivity implements BroadcastC
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        SharedPreferences preferences = getSharedPreferences("notificationString", MODE_PRIVATE);
+        String returnMessage = preferences.getString("callreturn", "");
+
+        if (returnMessage.equals("yes")) {
+            SharedPreferences.Editor editor = getContext().getSharedPreferences("notificationString", Context.MODE_PRIVATE).edit();
+            editor.putString("callreturn", "no");
+            editor.apply();
+            finish();
+        } else {
+            Log.wtf("return", "not");
+        }
+    }
+
+    @Override
     public void onClick(View v) {
         if (otherUserModel == null) {
             Toast.makeText(this, "loading...", Toast.LENGTH_SHORT).show();
@@ -232,12 +248,11 @@ public class OtherUserProfileActivity extends BaseActivity implements BroadcastC
 
     @Override
     public void OnBroadcastClicked(Broadcasts broadcasts) {
-        if (broadcasts.getVideourl() != null && broadcasts.getVideourl().startsWith("https://youtu")) {
+        if (broadcasts.getVideourl() != null && !broadcasts.getVideourl().isEmpty() && broadcasts.getVideourl().startsWith("https://youtu")) {
             Intent intent = new Intent(OtherUserProfileActivity.this, PlayYtBroadcastActivity.class);
             intent.putExtra("ytVideolink", broadcasts.getVideourl());
             startActivity(intent);
-        }
-        if (broadcasts.isOffline()&&broadcasts.getVideourl().isEmpty()) {
+        }else if (broadcasts.isOffline()&&broadcasts.getVideourl().isEmpty()&&broadcasts.getVideourl()==null) {
             Utility.makeFilePublic(this, null, Constants.S3Constants.OFFLINE_VIDEO_FOLDER + "/" + broadcasts.getBroadcast() + OfflineStreamActivity.EXT);
         } else if (broadcasts.getStatus().equalsIgnoreCase(Constants.GoCoder.ONLINE)) {
             Intent intent = new Intent(this, ViewStream.class);

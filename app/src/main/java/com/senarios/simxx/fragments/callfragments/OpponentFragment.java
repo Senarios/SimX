@@ -1,6 +1,7 @@
 package com.senarios.simxx.fragments.callfragments;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -27,6 +28,7 @@ import com.senarios.simxx.Utility;
 import com.senarios.simxx.activities.CallActivity;
 import com.senarios.simxx.databinding.FragmentOpponentBinding;
 import com.senarios.simxx.fragments.BaseFragment;
+import com.senarios.simxx.services.QbSignUpService;
 
 import org.json.JSONObject;
 

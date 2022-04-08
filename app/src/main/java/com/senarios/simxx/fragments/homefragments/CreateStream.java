@@ -1,5 +1,7 @@
 package com.senarios.simxx.fragments.homefragments;
 
+import static com.hdev.common.CommonUtils.hasPermissions;
+
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -16,7 +18,6 @@ import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -31,11 +32,9 @@ import com.google.android.material.snackbar.Snackbar;
 import com.hdev.common.CommonUtils;
 import com.hdev.common.Constants;
 import com.hdev.common.LocationHelper;
-import com.hdev.common.MessageEvent;
 import com.hdev.common.databinding.LayoutEditextBinding;
 import com.hdev.common.datamodels.Broadcasts;
 import com.hdev.common.datamodels.Tags;
-import com.hdev.common.datamodels.UserType;
 import com.senarios.simxx.R;
 import com.senarios.simxx.Utility;
 import com.senarios.simxx.activities.LiveStreamActivity;
@@ -44,21 +43,26 @@ import com.senarios.simxx.activities.OfflineStreamActivity;
 import com.senarios.simxx.activities.PicLocationActivity;
 import com.senarios.simxx.databinding.CreateStreamFragmentBinding;
 import com.senarios.simxx.fragments.BaseFragment;
+import com.senarios.simxx.models.ApiService;
+import com.senarios.simxx.models.SendMailRes;
 
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
-
+import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.hdev.common.CommonUtils.hasPermissions;
+import okhttp3.internal.Util;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
-public class CreateStream extends BaseFragment implements LocationHelper.LocationHelperCallback,Observer<Location>,View.OnClickListener,CompoundButton.OnCheckedChangeListener, Constants.SharedPreference, Constants.Messages {
+public class CreateStream extends BaseFragment implements LocationHelper.LocationHelperCallback, Observer<Location>, View.OnClickListener, CompoundButton.OnCheckedChangeListener, Constants.SharedPreference, Constants.Messages {
     private CreateStreamFragmentBinding binding;
     private static final int PERMISSION_CODE = 386;
-    private List<Tags> tags=new ArrayList<>();
-    private  String BROADCAST;
+    private List<Tags> tags = new ArrayList<>();
+    private String BROADCAST;
     private String jobDes;
     private Location mLastlocation;
     private LocationHelper locationHelper;
@@ -76,10 +80,10 @@ public class CreateStream extends BaseFragment implements LocationHelper.Locatio
     protected void init() {
         super.init();
         //ask permission
-        context=this.getContext();
+        context = this.getContext();
 
-        locationHelper=new LocationHelper(requireContext(),this);
-        locationHelper.getLocation().observe(this,this);
+        locationHelper = new LocationHelper(requireContext(), this);
+        locationHelper.getLocation().observe(this, this);
         getLifecycle().addObserver(locationHelper);
 
 
@@ -87,6 +91,10 @@ public class CreateStream extends BaseFragment implements LocationHelper.Locatio
 
         binding.checkFrontCamera.setOnCheckedChangeListener(this);
         binding.checkRearCamera.setOnCheckedChangeListener(this);
+        binding.jobSiteLink.setClickable(false);
+        binding.jobSiteLink.setEnabled(false);
+        binding.jobSiteView.setClickable(false);
+        binding.jobSiteView.setEnabled(false);
 
         binding.toolbar.setNavigationOnClickListener(v -> {
             if (getParentFragment() != null) {
@@ -95,19 +103,17 @@ public class CreateStream extends BaseFragment implements LocationHelper.Locatio
         });
         binding.btnLive.setOnClickListener(this);
         binding.btnLocation.setOnClickListener(this);
-        BROADCAST=getViewModel().getLoggedUser().getUsername()+System.currentTimeMillis();
-        tags.add(new Tags(null,"Add Tag"));
+        BROADCAST = getViewModel().getLoggedUser().getUsername() + System.currentTimeMillis();
+        tags.add(new Tags(null, "Add Tag"));
         binding.tagsView.setData(getAddedTags(tags));
         binding.tagsView.addOnTagSelectListener((item, selected) -> {
-            if (selected && !item.toString().equalsIgnoreCase("Add Tag")){
-                tags.remove(new Tags(BROADCAST,item.toString()));
+            if (selected && !item.toString().equalsIgnoreCase("Add Tag")) {
+                tags.remove(new Tags(BROADCAST, item.toString()));
                 binding.tagsView.setData(getAddedTags(tags));
-            }
-            else if (tags.size()==6){
-                Snackbar.make(binding.getRoot(),"Tags Limit Reached!",3000).show();
-            }
-            else{
-                if (item.toString().equalsIgnoreCase("Add Tag")){
+            } else if (tags.size() == 6) {
+                Snackbar.make(binding.getRoot(), "Tags Limit Reached!", 3000).show();
+            } else {
+                if (item.toString().equalsIgnoreCase("Add Tag")) {
                     initTagDialog();
                 }
             }
@@ -115,12 +121,39 @@ public class CreateStream extends BaseFragment implements LocationHelper.Locatio
         binding.rgApplyOnVideo.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 binding.rgApplyOnJobsite.setChecked(false);
+                binding.jobSiteLink.setText("");
+                binding.jobSiteLink.setClickable(false);
+                binding.jobSiteLink.setEnabled(false);
+                binding.jobSiteView.setClickable(false);
+                binding.jobSiteView.setEnabled(false);
             }
         });
 
         binding.rgApplyOnJobsite.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 binding.rgApplyOnVideo.setChecked(false);
+                binding.jobSiteLink.setClickable(true);
+                binding.jobSiteLink.setEnabled(true);
+                binding.jobSiteView.setClickable(true);
+                binding.jobSiteView.setEnabled(true);
+                binding.jobSiteView.setOnClickListener(v -> {
+                    EditText edttxt = new EditText(context);
+                    edttxt.setText(binding.jobSiteLink.getText().toString());
+                    new AlertDialog.Builder(context)
+                            .setTitle("URL")
+                            .setMessage("Add a job site link")
+                            .setView(edttxt)
+                            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    binding.jobSiteLink.setText(edttxt.getText().toString().trim());
+                                }
+                            })
+
+                            // A null listener allows the button to dismiss the dialog and take no further action.
+                            .setNegativeButton(android.R.string.cancel, null)
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .show();
+                });
             }
         });
         binding.messagesOnly.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -134,7 +167,8 @@ public class CreateStream extends BaseFragment implements LocationHelper.Locatio
                 binding.messagesOnly.setChecked(false);
                 binding.bothMsgCall.setChecked(false);
             }
-        });binding.bothMsgCall.setOnCheckedChangeListener((buttonView, isChecked) -> {
+        });
+        binding.bothMsgCall.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 binding.messagesOnly.setChecked(false);
                 binding.callOnly.setChecked(false);
@@ -171,12 +205,9 @@ public class CreateStream extends BaseFragment implements LocationHelper.Locatio
         binding.isVideoLink.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if (b == true)
-                {
+                if (b == true) {
                     binding.jobDes.setVisibility(View.VISIBLE);
-                }
-                else
-                {
+                } else {
                     binding.jobDes.setVisibility(View.GONE);
                 }
             }
@@ -192,8 +223,8 @@ public class CreateStream extends BaseFragment implements LocationHelper.Locatio
 
                 int type = Character.getType(source.charAt(index));
 
-                if (type == Character.SURROGATE || type==Character.NON_SPACING_MARK
-                        || type==Character.OTHER_SYMBOL) {
+                if (type == Character.SURROGATE || type == Character.NON_SPACING_MARK
+                        || type == Character.OTHER_SYMBOL) {
                     return "";
                 }
             }
@@ -205,7 +236,7 @@ public class CreateStream extends BaseFragment implements LocationHelper.Locatio
     private List<String> getAddedTags(List<Tags> tags) {
         List<String> tagsList = new ArrayList<>();
 
-        for (Tags tag:tags) {
+        for (Tags tag : tags) {
             tagsList.add(tag.getTag());
 
         }
@@ -213,26 +244,25 @@ public class CreateStream extends BaseFragment implements LocationHelper.Locatio
     }
 
     private void initTagDialog() {
-        AlertDialog.Builder builder=Utility.getAlertDialoge(requireContext(),"","");
-        View view=LayoutInflater.from(requireContext()).inflate(com.hdev.common.R.layout.layout_editext,null);
-        LayoutEditextBinding binding=DataBindingUtil.bind(view);
+        AlertDialog.Builder builder = Utility.getAlertDialoge(requireContext(), "", "");
+        View view = LayoutInflater.from(requireContext()).inflate(com.hdev.common.R.layout.layout_editext, null);
+        LayoutEditextBinding binding = DataBindingUtil.bind(view);
         binding.et.setFilters(new InputFilter[]{EMOJI_FILTER});
         builder.setView(binding.getRoot());
         builder.setPositiveButton("Add", (dialog, which) -> {
-            if (!Utility.getString(binding.et).isEmpty()){
-                tags.add(new Tags(BROADCAST,Utility.getString(binding.et).trim()));
+            if (!Utility.getString(binding.et).isEmpty()) {
+                tags.add(new Tags(BROADCAST, Utility.getString(binding.et).trim()));
                 CreateStream.this.binding.tagsView.setData(getAddedTags(tags));
                 dialog.dismiss();
-            }
-            else{
-                Snackbar.make(binding.getRoot(),"Enter Tag",3000).show();
+            } else {
+                Snackbar.make(binding.getRoot(), "Enter Tag", 3000).show();
             }
         }).show();
     }
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.cross:
 
                 break;
@@ -241,7 +271,7 @@ public class CreateStream extends BaseFragment implements LocationHelper.Locatio
                 break;
             case R.id.btn_location:
                 Intent intent = new Intent(getActivity(), PicLocationActivity.class);
-                intent.putExtra("itsStream","stream");
+                intent.putExtra("itsStream", "stream");
                 startActivity(intent);
                 break;
 
@@ -251,32 +281,31 @@ public class CreateStream extends BaseFragment implements LocationHelper.Locatio
 
 
     private void validations() {
-        if ( Utility.getString(binding.etTitle).isEmpty()) {
+        if (Utility.getString(binding.etTitle).isEmpty()) {
             binding.etTitle.setError("Enter title");
             binding.etTitle.requestFocus();
-        }else if (binding.cityName.getText().toString().isEmpty()) {
+        } else if (binding.cityName.getText().toString().isEmpty()) {
             Toast.makeText(getContext(), "Please Select location", Toast.LENGTH_SHORT).show();
             return;
         } else if (!Utility.isGooglePlayServicesAvailable(getContext())) {
             AlertDialog dialog = Utility.getAlertDialoge(getContext(), PLAY_SERVICE_ERROR_TITLE, PLAY_SERVICES_ERROR).create();
             dialog.show();
-        }
-        else if (!hasPermissions(getContext(), locationHelper.PERMISSIONS)) {
+        } else if (!hasPermissions(getContext(), locationHelper.PERMISSIONS)) {
             requestPermissions(locationHelper.PERMISSIONS, PERMISSION_CODE);
-        }
-        else if (mLastlocation == null) {
+        } else if (mLastlocation == null) {
             locationHelper.onRequestApproved();
-        }
-
-        else if (tags.size()==1){
-            Snackbar.make(binding.getRoot(),"Add Some tags",3000).show();
-        }
-        else {
+        } else if (tags.size() == 1) {
+            Snackbar.make(binding.getRoot(), "Add Some tags", 3000).show();
+        } else if (binding.rgApplyOnJobsite.isChecked() && binding.jobSiteLink.getText().toString().trim().isEmpty()) {
+            Toast.makeText(getContext(), "Enter job site link", Toast.LENGTH_SHORT).show();
+        } else if (binding.rgApplyOnJobsite.isChecked() && !binding.jobSiteLink.getText().toString().trim().startsWith("http")) {
+            Toast.makeText(getContext(), "Enter valid job site link", Toast.LENGTH_SHORT).show();
+        } else {
             String[] broadcastTypes = getResources().getStringArray(R.array.broadcast_type);
             AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
             alertDialog.setSingleChoiceItems(broadcastTypes, 0, (dialog, which) -> {
                 dialog.dismiss();
-                startBroadCasting(which==0?"00:30":"15:00");
+                startBroadCasting(which == 0 ? "00:30" : "15:00");
             });
             alertDialog.setNegativeButton("cancel", (dialog, which) -> {
                 dialog.dismiss();
@@ -315,19 +344,13 @@ public class CreateStream extends BaseFragment implements LocationHelper.Locatio
         if (requestCode == PERMISSION_CODE) {
             if (!hasPermissions(getContext(), permissions)) {
                 requestPermissions(locationHelper.PERMISSIONS, LocationHelper.CODE);
-            }
-            else if (CommonUtils.shouldShowRationalPermission(requireActivity(),locationHelper.PERMISSIONS)){
+            } else if (CommonUtils.shouldShowRationalPermission(requireActivity(), locationHelper.PERMISSIONS)) {
                 CommonUtils.showSettingDialog(requireActivity());
-            }
-            else {
-               locationHelper.onRequestApproved();
+            } else {
+                locationHelper.onRequestApproved();
             }
         }
     }
-
-
-
-
 
 
     @Override
@@ -335,7 +358,7 @@ public class CreateStream extends BaseFragment implements LocationHelper.Locatio
 
     }
 
-    private Broadcasts getBroadcast(){
+    private Broadcasts getBroadcast() {
         Broadcasts broadcast = new Broadcasts();
         broadcast.setUsername(getViewModel().getLoggedUser().getUsername());
         broadcast.setId(0);
@@ -348,11 +371,11 @@ public class CreateStream extends BaseFragment implements LocationHelper.Locatio
         String lat = prefs.getString("latt", "");
         String lng = prefs.getString("lonn", "");
         if (mLastlocation != null) {
-            broadcast.setLocation(Utility.getLocationFromLatLng(requireContext(),Double.parseDouble(lat), Double.parseDouble(lng)));
+            broadcast.setLocation(Utility.getLocationFromLatLng(requireContext(), Double.parseDouble(lat), Double.parseDouble(lng)));
             broadcast.setLatti(lat);
             broadcast.setLongi(lng);
         } else {
-            broadcast.setLocation(Utility.getLocationFromLatLng(requireContext(),2.0943, 57.1497));
+            broadcast.setLocation(Utility.getLocationFromLatLng(requireContext(), 2.0943, 57.1497));
             broadcast.setLatti("2.0943");
             broadcast.setLongi("57.1497");
         }
@@ -371,18 +394,19 @@ public class CreateStream extends BaseFragment implements LocationHelper.Locatio
             broadcast.setCallonly(true);
             broadcast.setMessageonly(false);
             broadcast.setBothmsgcall(false);
-        }
-        else if (binding.bothMsgCall.isChecked()) {
+        } else if (binding.bothMsgCall.isChecked()) {
             broadcast.setBothmsgcall(true);
             broadcast.setMessageonly(false);
             broadcast.setCallonly(false);
         }
         broadcast.setName(getViewModel().getLoggedUser().getName());
         broadcast.setBroadcast(BROADCAST);
+        broadcast.setJobSiteLink(binding.jobSiteLink.getText().toString().trim());
         broadcast.setSkill(Constants.BROADCASTER);
         broadcast.setImglink(broadcast.getBroadcast());
         broadcast.setOffline(false);
         broadcast.setApproved(true);
+        broadcast.setJobPostStatus("Pending");
         tags.remove(0);
         broadcast.setTags(tags);
 //       if (binding.isVideoLink.isChecked())
@@ -399,13 +423,10 @@ public class CreateStream extends BaseFragment implements LocationHelper.Locatio
     }
 
 
-
-
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode==locationHelper.CODE){
+        if (resultCode == locationHelper.CODE) {
             locationHelper.onRequestApproved();
         }
     }
@@ -413,7 +434,7 @@ public class CreateStream extends BaseFragment implements LocationHelper.Locatio
 
     @Override
     public void onChanged(Location location) {
-        mLastlocation=location;
+        mLastlocation = location;
     }
 
     @Override
@@ -425,12 +446,14 @@ public class CreateStream extends BaseFragment implements LocationHelper.Locatio
     public void onPermissionDenied() {
         CommonUtils.showSettingDialog(requireActivity());
     }
+
     @Override
     public void onStart() {
         super.onStart();
         LocalBroadcastManager.getInstance(getContext()).registerReceiver(mMessageReceiver,
                 new IntentFilter("custom-event-name"));
     }
+
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -441,7 +464,7 @@ public class CreateStream extends BaseFragment implements LocationHelper.Locatio
                 @Override
                 public void run() {
 //                    getActivity().onBackPressed();
-                    requireActivity().startActivity(new Intent(requireActivity(), MainActivity.class).putExtra("main",true));
+                    requireActivity().startActivity(new Intent(requireActivity(), MainActivity.class).putExtra("main", true));
                     requireActivity().finish();
                 }
             }, 1000);

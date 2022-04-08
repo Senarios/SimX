@@ -113,6 +113,17 @@ public class Broadcasts implements Serializable {
     @SerializedName("jobSiteLink")
     @Expose
     private String jobSiteLink;
+    @SerializedName("jobPostStatus")
+    @Expose
+    private String jobPostStatus;
+
+    public String getJobPostStatus() {
+        return jobPostStatus;
+    }
+
+    public void setJobPostStatus(String jobPostStatus) {
+        this.jobPostStatus = jobPostStatus;
+    }
 
     public String getJobSiteLink() {
         return jobSiteLink;

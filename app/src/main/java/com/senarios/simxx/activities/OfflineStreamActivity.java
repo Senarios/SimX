@@ -36,6 +36,8 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.Observer;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
@@ -58,6 +60,7 @@ import com.hdev.common.databinding.LayoutEditextBinding;
 import com.hdev.common.datamodels.Tags;
 import com.hdev.common.datamodels.UserType;
 import com.hdev.common.retrofit.ApiResponse;
+import com.hdev.common.retrofit.DataService;
 import com.hdev.common.retrofit.NetworkCall;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener;
@@ -69,6 +72,8 @@ import com.senarios.simxx.databinding.ActivityCreateOfflineStreamBinding;
 import com.hdev.common.datamodels.Broadcasts;
 import com.hdev.common.datamodels.S3UploadRequest;
 import com.senarios.simxx.fragments.homefragments.BroadcastsFragment;
+import com.senarios.simxx.models.ApiService;
+import com.senarios.simxx.models.SendMailRes;
 import com.senarios.simxx.services.AmazonS3UploadService;
 import com.squareup.picasso.Picasso;
 import com.video_trim.TrimmerActivity;
@@ -77,13 +82,19 @@ import com.video_trim.TrimmerActivity;
 import net.alhazmy13.mediapicker.Video.VideoPicker;
 
 
+import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import retrofit2.Call;
+import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class OfflineStreamActivity extends BaseActivity implements LocationHelper.LocationHelperCallback, Observer<Location>, OnSuccessListener<Location>, ApiResponse {
     private ActivityCreateOfflineStreamBinding binding;
@@ -367,14 +378,41 @@ public class OfflineStreamActivity extends BaseActivity implements LocationHelpe
                     else {
                         Utility.getAlertDialoge(this, "Confirmation", "You Really want to upload this video?")
                                 .setPositiveButton("Lets Go!", (dialog, which) -> {
-                                    dialog.dismiss();
-                                    S3UploadRequest();
-                                    SharedPreferences preferences = getSharedPreferences("myy", MODE_PRIVATE);
-                                    SharedPreferences.Editor editor = preferences.edit();
-                                    editor.putString("job_post_popup", "popup");
-                                    editor.putString("latt", "");
-                                    editor.putString("lonn", "");
-                                    editor.apply();
+                                    Utility.show(this);
+                                    Retrofit retrofit = new Retrofit.Builder().baseUrl("http://web.simx.tv/")
+                                            .addConverterFactory(GsonConverterFactory.create()).build();
+                                    ApiService apiPost = retrofit.create(ApiService.class);
+                                    Call<SendMailRes> call = apiPost.sendMail(getString(R.string.admin_mail),getString(R.string.admin_name)
+                                            ,getString(R.string.mail_title),getString(R.string.mail_body1)+" "+binding.etTitle.getText().toString().trim()+" "+getString(R.string.mail_body2));
+                                    call.enqueue(new Callback<SendMailRes>() {
+                                        @Override
+                                        public void onResponse(Call<SendMailRes> call, Response<SendMailRes> response) {
+                                            if (response.isSuccessful()) {
+                                                Utility.dismiss();
+                                                dialog.dismiss();
+                                                S3UploadRequest();
+                                                SharedPreferences preferences = getSharedPreferences("myy", MODE_PRIVATE);
+                                                SharedPreferences.Editor editor = preferences.edit();
+                                                editor.putString("job_post_popup", "popup");
+                                                editor.putString("latt", "");
+                                                editor.putString("lonn", "");
+                                                editor.apply();
+                                            } else {
+                                                Utility.dismiss();
+                                                Toast.makeText(OfflineStreamActivity.this, "Process Failed", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onFailure(Call<SendMailRes> call, Throwable t) {
+                                            Utility.dismiss();
+                                            if (t instanceof SocketTimeoutException) {
+                                                Toast.makeText(OfflineStreamActivity.this, "Time out, Please try again", Toast.LENGTH_SHORT).show();
+                                            } else if (t instanceof IOException) {
+                                                Toast.makeText(OfflineStreamActivity.this, "Check you internet connection", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                    });
                                 })
                                 .setNegativeButton("Naah", (dialog, which) -> dialog.dismiss())
                                 .show();
@@ -405,14 +443,42 @@ public class OfflineStreamActivity extends BaseActivity implements LocationHelpe
 //                    editorr.apply();
                     Utility.getAlertDialoge(this, "Confirmation", "You Really want to upload this video?")
                             .setPositiveButton("Lets Go!", (dialog, which) -> {
-                                dialog.dismiss();
-                                ytUploadRequest();
-                                SharedPreferences preferences = getSharedPreferences("myy", MODE_PRIVATE);
-                                SharedPreferences.Editor editor = preferences.edit();
-                                editor.putString("job_post_popup", "popup");
-                                editor.putString("latt", "");
-                                editor.putString("lonn", "");
-                                editor.apply();
+                                Utility.show(this);
+                                Retrofit retrofit = new Retrofit.Builder().baseUrl("http://web.simx.tv/")
+                                        .addConverterFactory(GsonConverterFactory.create()).build();
+                                ApiService apiPost = retrofit.create(ApiService.class);
+                                Call<SendMailRes> call = apiPost.sendMail(getString(R.string.admin_mail),getString(R.string.admin_name),
+                                        getString(R.string.mail_title),getString(R.string.mail_body1)+" "+binding.etTitle.getText().toString().trim()+" "+getString(R.string.mail_body2));
+                                call.enqueue(new Callback<SendMailRes>() {
+                                    @Override
+                                    public void onResponse(Call<SendMailRes> call, Response<SendMailRes> response) {
+                                        if (response.isSuccessful()) {
+                                            Utility.dismiss();
+                                            dialog.dismiss();
+                                            ytUploadRequest();
+                                            SharedPreferences preferences = getSharedPreferences("myy", MODE_PRIVATE);
+                                            SharedPreferences.Editor editor = preferences.edit();
+                                            editor.putString("job_post_popup", "popup");
+                                            editor.putString("latt", "");
+                                            editor.putString("lonn", "");
+                                            editor.apply();
+                                        } else {
+                                            Utility.dismiss();
+                                            Toast.makeText(OfflineStreamActivity.this, "Process Failed", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<SendMailRes> call, Throwable t) {
+                                        Utility.dismiss();
+                                        if (t instanceof SocketTimeoutException) {
+                                            Toast.makeText(OfflineStreamActivity.this, "Time out, Please try again", Toast.LENGTH_SHORT).show();
+                                        } else if (t instanceof IOException) {
+                                            Toast.makeText(OfflineStreamActivity.this, "Check you internet connection", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                });
+
                             })
                             .setNegativeButton("Naah", (dialog, which) -> dialog.dismiss())
                             .show();
@@ -670,6 +736,7 @@ public class OfflineStreamActivity extends BaseActivity implements LocationHelpe
         broadcast.setImglink(broadcast.getBroadcast());
         broadcast.setOffline(true);
         broadcast.setApproved(true);
+        broadcast.setJobPostStatus("Pending");
 //        if (binding.isJob.isChecked()) {
 //        broadcast.setIsjob(binding.isVideoLink.isChecked());
 //        broadcast.setJobDes(binding.jobDes.getText().toString());

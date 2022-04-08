@@ -9,7 +9,16 @@
     <string name="AWSAppAccessSecretKey">zcwTGIst+Qne2FLC4wC2tWRUccFz23zXvg+1Aygn</string>
     <string name="APPLICATION_ARN">arn:aws:sns:us-west-2:867277458368:app/GCM/H2startup</string>
 
+    <!-- send email strings -->
+    <string name="admin_mail">testconvirza@gmail.com</string>
+    <string name="admin_name">MuhammadWaleed</string>
+    <string name="mail_title">Job Post Approval</string>
+    <string name="mail_body1">A new broadcast</string>
+    <string name="mail_body2">is pending for approval</string>
+    <!-- send email strings -->
+
     <!-- Settings strings. -->
+
 
     <string name="pref_resolution_default">-1</string>
     <string name="pref_fps_key">fps_preference</string>
